@@ -9,8 +9,8 @@ A multi-process system simulator implemented in C for Operating Systems PBL. The
 | Team Member | Role | Technical Responsibility |
 |:---|:---|:---|
 | **Aditi Nayak** *(Team Leader)* | **IPC Architect & Integration** | **POSIX Pipes IPC**, process lifecycle management (`pipe()`, `fork()`, `waitpid()`, `close()`), descriptor hygiene, end-to-end integration, and system verification |
-| **Anas Ahmed** | UI Process | User interaction, command validation, interactive REPL interface, and result rendering |
-| **Nireeksha** | Core Process | Computational core containing CPU arithmetic, Memory, Stack, and Queue subsystems |
+| **Nireeksha** | UI Process | User interaction, command validation, interactive REPL interface, and result rendering |
+| **Anas Ahmed** | Core Process | Computational core containing CPU arithmetic, Memory, Stack, and Queue subsystems |
 | **Yaseem** | Logging Process | System logging daemon, log formatting, and persistent disk recording (`yaseem.log`) |
 
 ---
