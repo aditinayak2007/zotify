@@ -1,1 +1,1 @@
-Project based learning for OSCO and DSA
+Week 1 : inter process communication with methods and techniques. Week 2: Enhance the existing simulator by separating it into three independent processes and enabling communication between them using an appropriate POSIX IPC mechanism.
