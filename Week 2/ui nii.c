@@ -167,4 +167,4 @@ int main(void)
     wait(NULL);
     return rc == 0 ? 0 : 1;
 }
-#endif
+
