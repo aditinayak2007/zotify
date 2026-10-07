@@ -1,17 +1,3 @@
-/*
- * ui.c - UI process for the multi-process simulator (Week 4)
- *
- * Job: take user input, validate it, send it to Core through a pipe,
- * read Core's reply, and display it.
- *
- * Message format (agree this with the team):
- *   UI   -> Core : one command per line, ending in '\n'   e.g. "ADD 10 20\n"
- *   Core -> UI   : one reply per line, ending in '\n'     e.g. "30\n"
- *
- * Integration:  call ui_process(fd_to_core, fd_from_core) from main()
- * Stand-alone test:  gcc -DUI_STANDALONE -o ui_test ui.c && ./ui_test
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
