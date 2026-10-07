@@ -1,15 +1,24 @@
 /*
- * Week 2 PBL 
- * Core Process written by Anas Ahmed / Nireeksha
- * CODE : 
+ * core.c - Core process for the multi-process simulator (Week 4)
+ * Written by: Nireeksha
+ * Integrated with Pipes IPC by: Aditi Nayak
+ *
+ * Subsystems:
+ *  - CPU (ADD, SUB, MUL, DIV)
+ *  - Memory (STORE, LOAD)
+ *  - Stack (PUSH, POP)
+ *  - Queue (ENQUEUE, DEQUEUE)
+ *
+ * IPC Communication:
+ *  - Receives commands from UI Process via pipe (from_ui)
+ *  - Sends results back to UI Process via pipe (to_ui)
+ *  - Forwards operation logs to Logging Process via pipe (to_logger)
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+
+#include "pipe_ipc.h"
+#include "core.h"
 
 #define MAX_SIZE 100
-#define BUFFER_SIZE 100
 
 /* ================= MEMORY ================= */
 
@@ -36,7 +45,6 @@ int loadMemory(int address)
     return -1;
 }
 
-
 /* ================= STACK ================= */
 
 int stack[MAX_SIZE];
@@ -51,7 +59,6 @@ void push(int value)
     }
 
     stack[++top] = value;
-
     printf("[CORE] PUSH %d\n", value);
 }
 
@@ -65,7 +72,6 @@ int pop()
 
     return stack[top--];
 }
-
 
 /* ================= QUEUE ================= */
 
@@ -82,7 +88,6 @@ void enqueue(int value)
     }
 
     queue[++rear] = value;
-
     printf("[CORE] ENQUEUE %d\n", value);
 }
 
@@ -97,14 +102,12 @@ int dequeue()
     return queue[front++];
 }
 
-
 /* ================= CPU ================= */
 
 /*
    CPU executes the instruction received
    from the UI.
 */
-
 void executeCommand(char command[], char result[])
 {
     int a, b;
@@ -114,11 +117,7 @@ void executeCommand(char command[], char result[])
     if (sscanf(command, "ADD %d %d", &a, &b) == 2)
     {
         value = a + b;
-
-        sprintf(result,
-                "CPU: %d + %d = %d",
-                a, b, value);
-
+        sprintf(result, "CPU: %d + %d = %d", a, b, value);
         return;
     }
 
@@ -126,11 +125,7 @@ void executeCommand(char command[], char result[])
     if (sscanf(command, "SUB %d %d", &a, &b) == 2)
     {
         value = a - b;
-
-        sprintf(result,
-                "CPU: %d - %d = %d",
-                a, b, value);
-
+        sprintf(result, "CPU: %d - %d = %d", a, b, value);
         return;
     }
 
@@ -138,11 +133,7 @@ void executeCommand(char command[], char result[])
     if (sscanf(command, "MUL %d %d", &a, &b) == 2)
     {
         value = a * b;
-
-        sprintf(result,
-                "CPU: %d * %d = %d",
-                a, b, value);
-
+        sprintf(result, "CPU: %d * %d = %d", a, b, value);
         return;
     }
 
@@ -156,11 +147,7 @@ void executeCommand(char command[], char result[])
         }
 
         value = a / b;
-
-        sprintf(result,
-                "CPU: %d / %d = %d",
-                a, b, value);
-
+        sprintf(result, "CPU: %d / %d = %d", a, b, value);
         return;
     }
 
@@ -168,11 +155,7 @@ void executeCommand(char command[], char result[])
     if (sscanf(command, "PUSH %d", &value) == 1)
     {
         push(value);
-
-        sprintf(result,
-                "Stack: Pushed %d",
-                value);
-
+        sprintf(result, "Stack: Pushed %d", value);
         return;
     }
 
@@ -180,35 +163,23 @@ void executeCommand(char command[], char result[])
     if (strcmp(command, "POP") == 0)
     {
         value = pop();
-
-        sprintf(result,
-                "Stack: Popped %d",
-                value);
-
+        sprintf(result, "Stack: Popped %d", value);
         return;
     }
 
     /* ENQUEUE */
-    if (sscanf(command, "ENQUEUE %d", &value) == 1)
+    if (sscanf(command, "ENQUEUE %d", &value) == 1 || sscanf(command, "ENQ %d", &value) == 1)
     {
         enqueue(value);
-
-        sprintf(result,
-                "Queue: Enqueued %d",
-                value);
-
+        sprintf(result, "Queue: Enqueued %d", value);
         return;
     }
 
     /* DEQUEUE */
-    if (strcmp(command, "DEQUEUE") == 0)
+    if (strcmp(command, "DEQUEUE") == 0 || strcmp(command, "DEQ") == 0)
     {
         value = dequeue();
-
-        sprintf(result,
-                "Queue: Dequeued %d",
-                value);
-
+        sprintf(result, "Queue: Dequeued %d", value);
         return;
     }
 
@@ -216,11 +187,7 @@ void executeCommand(char command[], char result[])
     if (sscanf(command, "STORE %d %d", &a, &b) == 2)
     {
         storeMemory(a, b);
-
-        sprintf(result,
-                "Memory: Stored %d at address %d",
-                b, a);
-
+        sprintf(result, "Memory: Stored %d at address %d", b, a);
         return;
     }
 
@@ -228,11 +195,7 @@ void executeCommand(char command[], char result[])
     if (sscanf(command, "LOAD %d", &a) == 1)
     {
         value = loadMemory(a);
-
-        sprintf(result,
-                "Memory[%d] = %d",
-                a, value);
-
+        sprintf(result, "Memory[%d] = %d", a, value);
         return;
     }
 
@@ -240,31 +203,7 @@ void executeCommand(char command[], char result[])
     strcpy(result, "Core: Invalid command");
 }
 
-
-/* ================= LOGGER ================= */
-
-void logExecution(char command[], char result[])
-{
-    FILE *file;
-
-    file = fopen("nireeksha_log.txt", "a");
-
-    if (file == NULL)
-    {
-        return;
-    }
-
-    fprintf(file,
-            "[CORE PID: %d] Command: %s | Result: %s\n",
-            getpid(),
-            command,
-            result);
-
-    fclose(file);
-}
-
-
-/* ================= CORE PROCESS (PIPE IPC) ================= */
+/* ================= CORE PROCESS RUNNER (PIPE IPC) ================= */
 
 int core_process(int from_ui, int to_ui, int to_logger)
 {
@@ -287,44 +226,56 @@ int core_process(int from_ui, int to_ui, int to_logger)
 
     while (1)
     {
+        /* Receive command from UI through pipe */
         if (fgets(command, BUFFER_SIZE, in) == NULL)
         {
+            /* UI closed the pipe */
             break;
         }
 
+        /* Remove trailing newline / carriage return */
         command[strcspn(command, "\r\n")] = '\0';
+
         if (strlen(command) == 0)
         {
             continue;
         }
 
+        /* Handle EXIT */
         if (strcmp(command, "EXIT") == 0)
         {
             strcpy(result, "Core Process terminated");
 
+            /* Format log message and send to Logger process via pipe */
             snprintf(log_msg, sizeof(log_msg), "[CORE PID: %d] Command: %s | Result: %s\n",
                      (int)getpid(), command, result);
             if (write(to_logger, log_msg, strlen(log_msg)) < 0) {
                 perror("Core: write to logger failed");
             }
 
+            /* Send termination command to Logger process */
             if (write(to_logger, "LOGGER_EXIT\n", 12) < 0) {
                 perror("Core: write LOGGER_EXIT failed");
             }
 
+            /* Send result back to UI through pipe */
             fprintf(out, "%s\n", result);
             fflush(out);
+
             break;
         }
 
+        /* CPU / Memory / Stack / Queue processes the command */
         executeCommand(command, result);
 
+        /* Send execution log to Logger Process through pipe */
         snprintf(log_msg, sizeof(log_msg), "[CORE PID: %d] Command: %s | Result: %s\n",
                  (int)getpid(), command, result);
         if (write(to_logger, log_msg, strlen(log_msg)) < 0) {
             perror("Core: write to logger failed");
         }
 
+        /* Send result back to UI through pipe */
         fprintf(out, "%s\n", result);
         fflush(out);
     }
@@ -336,7 +287,7 @@ int core_process(int from_ui, int to_ui, int to_logger)
 }
 
 #ifdef CORE_STANDALONE
-int main()
+int main(void)
 {
     char command[BUFFER_SIZE];
     char result[BUFFER_SIZE];
@@ -345,29 +296,18 @@ int main()
     printf("  CORE PROCESS (STANDALONE)\n");
     printf("=====================================\n");
 
-    while (1)
+    while (fgets(command, BUFFER_SIZE, stdin) != NULL)
     {
-        if (fgets(command, BUFFER_SIZE, stdin) == NULL)
-        {
-            break;
-        }
-
-        command[strcspn(command, "\n")] = '\0';
-
+        command[strcspn(command, "\r\n")] = '\0';
         if (strcmp(command, "EXIT") == 0)
         {
-            strcpy(result, "Core Process terminated");
-            logExecution(command, result);
-            printf("%s\n", result);
+            printf("Core Process terminated\n");
             break;
         }
-
         executeCommand(command, result);
-        logExecution(command, result);
         printf("%s\n", result);
         fflush(stdout);
     }
-
     return 0;
 }
 #endif

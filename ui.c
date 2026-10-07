@@ -1,13 +1,19 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+/*
+ * ui.c - UI process for the multi-process simulator (Week 4)
+ * Written by: Anas Ahmed
+ * Integrated with Pipes IPC by: Aditi Nayak
+ *
+ * Job: take user input, validate it, send it to Core through a pipe,
+ * read Core's reply, and display it.
+ *
+ * Message format:
+ *   UI   -> Core : one command per line, ending in '\n'   e.g. "ADD 10 20\n"
+ *   Core -> UI   : one reply per line, ending in '\n'     e.g. "CPU: 10 + 20 = 30\n"
+ */
+
+#include "pipe_ipc.h"
+#include "ui.h"
 #include <ctype.h>
-#ifndef _WIN32
-#include <unistd.h>
-#include <sys/wait.h>
-#else
-#include <io.h>
-#endif
 
 #define MAX_LINE 256
 
@@ -16,11 +22,14 @@ static void print_menu(void)
     printf("\n=========== SIMULATOR ===========\n");
     printf("Type a command and press Enter.\n");
     printf("Examples (match these with Core's commands):\n");
-    printf("  ADD 10 20        - CPU operation\n");
+    printf("  ADD 10 20        - CPU addition\n");
+    printf("  SUB 20 10        - CPU subtraction\n");
+    printf("  MUL 5 6          - CPU multiplication\n");
+    printf("  DIV 20 4         - CPU division\n");
     printf("  STORE 5 99       - write to memory\n");
     printf("  LOAD 5           - read from memory\n");
     printf("  PUSH 7 / POP     - stack operations\n");
-    printf("  ENQ 3 / DEQ      - queue operations\n");
+    printf("  ENQUEUE 3 / DEQUEUE - queue operations\n");
     printf("  HELP             - show this menu\n");
     printf("  EXIT             - quit the simulator\n");
     printf("=================================\n");
@@ -71,6 +80,9 @@ int ui_process(int to_core, int from_core)
         /* 1. read user input (Ctrl+D = exit) */
         if (!fgets(raw, sizeof raw, stdin)) {
             printf("\nEnd of input. Exiting.\n");
+            /* Send EXIT to Core so it and Logger terminate cleanly */
+            fprintf(out, "EXIT\n");
+            fflush(out);
             break;
         }
 
@@ -106,6 +118,12 @@ int ui_process(int to_core, int from_core)
         }
 
         if (strcmp(cmd, "EXIT") == 0) {
+            /* Wait for Core's termination acknowledgment */
+            if (fgets(reply, sizeof reply, in)) {
+                printf("Result: %s", reply);
+                if (strchr(reply, '\n') == NULL)
+                    printf("\n");
+            }
             printf("Exiting simulator...\n");
             break;
         }
@@ -129,10 +147,6 @@ int ui_process(int to_core, int from_core)
     return 0;
 }
 
-/* ------------------------------------------------------------------ */
-/* Stand-alone test: a fake Core that just echoes, so you can test    */
-/* the UI before the real Core and pipes from the team are ready.      */
-/* ------------------------------------------------------------------ */
 #ifdef UI_STANDALONE
 int main(void)
 {
@@ -172,4 +186,3 @@ int main(void)
     return rc == 0 ? 0 : 1;
 }
 #endif
-

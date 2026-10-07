@@ -1,0 +1,9 @@
+# Build artifacts
+simulator
+simulator.exe
+*.exe
+*.o
+
+# Runtime logs
+yaseem.log
+nireeksha_log.txt

@@ -1,22 +1,18 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-#define BUFFER_SIZE 256
-#define LOG_FILE "yaseem.log"
-
 /*
- * Logging Process
+ * logger.c - Logging process for the multi-process simulator (Week 4)
+ * Written by: Yaseem
+ * Integrated with Pipes IPC by: Aditi Nayak
  *
  * Responsibilities:
  * 1. Receive information from Core through a POSIX pipe
  * 2. Record successful operations
  * 3. Record errors
  * 4. Record important events
- * 5. Store information in a log file
+ * 5. Store information in log file (yaseem.log)
  */
+
+#include "pipe_ipc.h"
+#include "logger.h"
 
 void writeLog(const char *message)
 {
@@ -29,7 +25,6 @@ void writeLog(const char *message)
     }
 
     fprintf(file, "%s\n", message);
-
     fclose(file);
 }
 
