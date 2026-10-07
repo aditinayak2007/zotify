@@ -106,6 +106,11 @@ int ui_process(int to_core, int from_core)
         }
 
         if (strcmp(cmd, "EXIT") == 0) {
+            if (fgets(reply, sizeof reply, in)) {
+                printf("Result: %s", reply);
+                if (strchr(reply, '\n') == NULL)
+                    printf("\n");
+            }
             printf("Exiting simulator...\n");
             break;
         }
