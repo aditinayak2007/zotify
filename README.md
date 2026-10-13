@@ -1,4 +1,4 @@
-# Multi-Process Simulator (Week 4 PBL)
+# Multi-Process Simulator (Week 2 PBL)
 
 A multi-process system simulator implemented in C for Operating Systems PBL. The simulator models a modular computer architecture separated into three independent concurrent processes communicating via **POSIX Pipes Inter-Process Communication (IPC)**.
 
