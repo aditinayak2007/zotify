@@ -1,0 +1,78 @@
+
+=== Test 1 - Non-preemptive SJF ===
+PID  AT  BT  CT  TAT  WT  RT
+P1     0   7   7    7   0   0
+P2     2   4  12   10   6   6
+P3     4   1   8    4   3   3
+P4     5   4  16   11   7   7
+Avg WT=4.00  Avg TAT=8.00  Avg RT=4.00
+
+Gantt Chart:
++--------------+-----+--------+--------+
+|      P1      | P3  |   P2   |   P4   |
++--------------+-----+--------+--------+
+0              7     8        12       16
+
+=== Test 1 - Preemptive SJF (SRTF) ===
+PID  AT  BT  CT  TAT  WT  RT
+P1     0   7  16   16   9   0
+P2     2   4   7    5   1   0
+P3     4   1   5    1   0   0
+P4     5   4  11    6   2   2
+Avg WT=3.00  Avg TAT=7.00  Avg RT=0.50
+
+Gantt Chart:
++-----+-----+-----+-----+--------+----------+
+| P1  | P2  | P3  | P2  |   P4   |    P1    |
++-----+-----+-----+-----+--------+----------+
+0     2     4     5     7        11         16
+
+=== Test 2 - Idle gaps (non-preemptive) ===
+PID  AT  BT  CT  TAT  WT  RT
+P1     2   3   5    3   0   0
+P2    10   2  12    2   0   0
+Avg WT=0.00  Avg TAT=2.50  Avg RT=0.00
+
+Gantt Chart:
++-----+------+----------+-----+
+|IDLE |  P1  |   IDLE   | P2  |
++-----+------+----------+-----+
+0     2      5          10    12
+
+=== Test 2 - Idle gaps (preemptive) ===
+PID  AT  BT  CT  TAT  WT  RT
+P1     2   3   5    3   0   0
+P2    10   2  12    2   0   0
+Avg WT=0.00  Avg TAT=2.50  Avg RT=0.00
+
+Gantt Chart:
++-----+------+----------+-----+
+|IDLE |  P1  |   IDLE   | P2  |
++-----+------+----------+-----+
+0     2      5          10    12
+
+=== Test 3 - Tie-break (non-preemptive) ===
+PID  AT  BT  CT  TAT  WT  RT
+P3     1   4  12   11   7   7
+P1     0   4   4    4   0   0
+P2     0   4   8    8   4   4
+Avg WT=3.67  Avg TAT=7.67  Avg RT=3.67
+
+Gantt Chart:
++--------+--------+--------+
+|   P1   |   P2   |   P3   |
++--------+--------+--------+
+0        4        8        12
+
+=== Test 4 - Single process (preemptive) ===
+PID  AT  BT  CT  TAT  WT  RT
+P1     0   5   5    5   0   0
+Avg WT=0.00  Avg TAT=5.00  Avg RT=0.00
+
+Gantt Chart:
++----------+
+|    P1    |
++----------+
+0          5
+
+All tests passed.
