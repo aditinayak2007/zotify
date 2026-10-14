@@ -1,0 +1,229 @@
+1. Define And Implementation:
+- Accept Process ID (PID), Arrival Time (AT), Burst Time (BT), and Priority from the user.
+- Implement FCFS (First-Come-First-Served).
+- Implement Round Robin with a user-configurable time quantum.
+- Display the execution order, Completion Time (CT), Turnaround Time (TAT), and Waiting Time (WT).
+- Calculate average waiting time and average turnaround time.
+- Test both algorithms using the same process inputs.
+
+
+2. C implementation
+
+#include <stdio.h>
+
+#define MAX 100
+
+typedef struct {
+    int pid, at, bt, priority;
+    int ct, tat, wt, remaining;
+} Process;
+
+void display(Process p[], int n, const char *algorithm) {
+    float totalWT = 0, totalTAT = 0;
+
+    printf("\n--- %s Results ---\n", algorithm);
+    printf("PID\tAT\tBT\tPriority\tCT\tTAT\tWT\n");
+
+    for (int i = 0; i < n; i++) {
+        printf("P%d\t%d\t%d\t%d\t\t%d\t%d\t%d\n",
+               p[i].pid, p[i].at, p[i].bt, p[i].priority,
+               p[i].ct, p[i].tat, p[i].wt);
+
+        totalWT += p[i].wt;
+        totalTAT += p[i].tat;
+    }
+
+    printf("Average Waiting Time: %.2f\n", totalWT / n);
+    printf("Average Turnaround Time: %.2f\n", totalTAT / n);
+}
+
+void fcfs(Process input[], int n) {
+    Process p[MAX];
+    int order[MAX];
+
+    for (int i = 0; i < n; i++) {
+        p[i] = input[i];
+        order[i] = i;
+    }
+
+    // Sort processes by arrival time
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (p[order[i]].at > p[order[j]].at) {
+                int temp = order[i];
+                order[i] = order[j];
+                order[j] = temp;
+            }
+        }
+    }
+
+    int time = 0;
+
+    printf("\nFCFS Execution Order: ");
+
+    for (int i = 0; i < n; i++) {
+        Process *x = &p[order[i]];
+
+        if (time < x->at)
+            time = x->at;
+
+        printf("P%d ", x->pid);
+
+        time += x->bt;
+        x->ct = time;
+        x->tat = x->ct - x->at;
+        x->wt = x->tat - x->bt;
+    }
+
+    display(p, n, "FCFS");
+}
+
+void roundRobin(Process input[], int n, int quantum) {
+    Process p[MAX];
+    int queue[100000];
+    int front = 0, rear = 0;
+    int added[MAX] = {0};
+    int time = 0, completed = 0;
+
+    for (int i = 0; i < n; i++) {
+        p[i] = input[i];
+        p[i].remaining = p[i].bt;
+    }
+
+    printf("\nRound Robin Execution Order: ");
+
+    while (completed < n) {
+        // Add arrived processes in arrival-time order
+        while (1) {
+            int next = -1;
+
+            for (int i = 0; i < n; i++) {
+                if (!added[i] && p[i].at <= time &&
+                    (next == -1 || p[i].at < p[next].at))
+                    next = i;
+            }
+
+            if (next == -1)
+                break;
+
+            queue[rear++] = next;
+            added[next] = 1;
+        }
+
+        if (front == rear) {
+            int nextTime = -1;
+
+            for (int i = 0; i < n; i++)
+                if (!added[i] &&
+                    (nextTime == -1 || p[i].at < nextTime))
+                    nextTime = p[i].at;
+
+            time = nextTime;
+            continue;
+        }
+
+        int i = queue[front++];
+        int run = p[i].remaining < quantum
+                    ? p[i].remaining : quantum;
+
+        printf("P%d ", p[i].pid);
+
+        time += run;
+        p[i].remaining -= run;
+
+        // Add processes that arrived during this time slice
+        while (1) {
+            int next = -1;
+
+            for (int j = 0; j < n; j++) {
+                if (!added[j] && p[j].at <= time &&
+                    (next == -1 || p[j].at < p[next].at))
+                    next = j;
+            }
+
+            if (next == -1)
+                break;
+
+            queue[rear++] = next;
+            added[next] = 1;
+        }
+
+        if (p[i].remaining > 0) {
+            queue[rear++] = i;
+        } else {
+            p[i].ct = time;
+            p[i].tat = p[i].ct - p[i].at;
+            p[i].wt = p[i].tat - p[i].bt;
+            completed++;
+        }
+    }
+
+    display(p, n, "Round Robin");
+}
+
+int main(void) {
+    Process p[MAX];
+    int n, quantum;
+
+    printf("Enter number of processes (1-%d): ", MAX);
+
+    if (scanf("%d", &n) != 1 || n < 1 || n > MAX) {
+        printf("Invalid number of processes.\n");
+        return 1;
+    }
+
+    for (int i = 0; i < n; i++) {
+        printf("\nEnter PID, Arrival Time, Burst Time, Priority for P%d: ",
+               i + 1);
+
+        if (scanf("%d %d %d %d",
+                  &p[i].pid, &p[i].at,
+                  &p[i].bt, &p[i].priority) != 4 ||
+            p[i].pid < 0 || p[i].at < 0 || p[i].bt <= 0) {
+            printf("Invalid process data.\n");
+            return 1;
+        }
+
+        for (int j = 0; j < i; j++) {
+            if (p[j].pid == p[i].pid) {
+                printf("Duplicate PID. Each process must have a unique PID.\n");
+                return 1;
+            }
+        }
+    }
+
+    printf("\nEnter Round Robin time quantum: ");
+
+    if (scanf("%d", &quantum) != 1 || quantum <= 0) {
+        printf("Time quantum must be positive.\n");
+        return 1;
+    }
+
+    fcfs(p, n);
+    roundRobin(p, n, quantum);
+
+    return 0;
+}
+
+```
+
+ 3. Sample test
+
+Enter these values when running the program:
+
+| PID | Arrival Time | Burst Time | Priority |
+| --- | ------------ | ---------- | -------- |
+| 1   | 0            | 5          | 2        |
+| 2   | 1            | 3          | 1        |
+| 3   | 2            | 1          | 3        |
+
+Set the Round Robin time quantum to `2`.
+
+Expected metrics:
+
+| Metric                  | FCFS | Round Robin |
+| ----------------------- | ---- | ----------- |
+| Average waiting time    | 3.33 | 2.67        |
+| Average turnaround time | 6.33 | 5.33        |
+
+The execution order is `P1 → P2 → P3` for FCFS. Round Robin switches between processes after each time quantum, allowing other ready processes to execute.
