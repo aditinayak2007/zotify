@@ -1,0 +1,222 @@
+1. C program — Priority Scheduling
+
+#include <stdio.h>
+
+#define MAX 100
+
+typedef struct {
+    int pid, at, bt, priority;
+    int ct, tat, wt, rt, remaining;
+} Process;
+
+void display(Process p[], int n, const char *name) {
+    float totalWT = 0, totalTAT = 0, totalRT = 0;
+
+    printf("\n--- %s ---\n", name);
+    printf("PID\tAT\tBT\tPriority\tCT\tWT\tTAT\tRT\n");
+
+    for (int i = 0; i < n; i++) {
+        printf("P%d\t%d\t%d\t%d\t\t%d\t%d\t%d\t%d\n",
+               p[i].pid, p[i].at, p[i].bt, p[i].priority,
+               p[i].ct, p[i].wt, p[i].tat, p[i].rt);
+
+        totalWT += p[i].wt;
+        totalTAT += p[i].tat;
+        totalRT += p[i].rt;
+    }
+
+    printf("\nAverage Waiting Time: %.2f\n", totalWT / n);
+    printf("Average Turnaround Time: %.2f\n", totalTAT / n);
+    printf("Average Response Time: %.2f\n", totalRT / n);
+}
+
+int better(Process a, Process b) {
+    if (a.priority != b.priority)
+        return a.priority < b.priority;
+
+    if (a.at != b.at)
+        return a.at < b.at;
+
+    return a.pid < b.pid;
+}
+
+// Non-preemptive Priority Scheduling
+void nonPreemptive(Process input[], int n) {
+    Process p[MAX];
+    int done[MAX] = {0};
+    int time = 0, completed = 0;
+
+    for (int i = 0; i < n; i++)
+        p[i] = input[i];
+
+    printf("\nNon-preemptive Execution Order: ");
+
+    while (completed < n) {
+        int best = -1;
+
+        for (int i = 0; i < n; i++) {
+            if (!done[i] && p[i].at <= time) {
+                if (best == -1 || better(p[i], p[best]))
+                    best = i;
+            }
+        }
+
+        if (best == -1) {
+            time++;
+            continue;
+        }
+
+        printf("P%d ", p[best].pid);
+
+        p[best].rt = time - p[best].at;
+        time += p[best].bt;
+
+        p[best].ct = time;
+        p[best].tat = p[best].ct - p[best].at;
+        p[best].wt = p[best].tat - p[best].bt;
+
+        done[best] = 1;
+        completed++;
+    }
+
+    display(p, n, "Non-preemptive Priority Scheduling");
+}
+
+// Preemptive Priority Scheduling
+void preemptive(Process input[], int n) {
+    Process p[MAX];
+    int time = 0, completed = 0;
+    int firstStart[MAX];
+
+    for (int i = 0; i < n; i++) {
+        p[i] = input[i];
+        p[i].remaining = p[i].bt;
+        firstStart[i] = -1;
+    }
+
+    printf("\nPreemptive Execution Timeline:\n");
+
+    while (completed < n) {
+        int best = -1;
+
+        for (int i = 0; i < n; i++) {
+            if (p[i].remaining > 0 && p[i].at <= time) {
+                if (best == -1 || better(p[i], p[best]))
+                    best = i;
+            }
+        }
+
+        if (best == -1) {
+            time++;
+            continue;
+        }
+
+        if (firstStart[best] == -1)
+            firstStart[best] = time;
+
+        printf("Time %d-%d: P%d\n",
+               time, time + 1, p[best].pid);
+
+        p[best].remaining--;
+        time++;
+
+        if (p[best].remaining == 0) {
+            p[best].ct = time;
+            p[best].tat = p[best].ct - p[best].at;
+            p[best].wt = p[best].tat - p[best].bt;
+            p[best].rt = firstStart[best] - p[best].at;
+            completed++;
+        }
+    }
+
+    display(p, n, "Preemptive Priority Scheduling");
+}
+
+int main(void) {
+    Process p[MAX];
+    int n;
+
+    printf("Enter number of processes (1-%d): ", MAX);
+
+    if (scanf("%d", &n) != 1 || n < 1 || n > MAX) {
+        printf("Invalid number of processes.\n");
+        return 1;
+    }
+
+    for (int i = 0; i < n; i++) {
+        printf("\nEnter PID, Arrival Time, Burst Time, Priority for P%d: ",
+               i + 1);
+
+        if (scanf("%d %d %d %d",
+                  &p[i].pid, &p[i].at,
+                  &p[i].bt, &p[i].priority) != 4 ||
+            p[i].pid < 0 || p[i].at < 0 || p[i].bt <= 0) {
+            printf("Invalid input. Arrival time must be >= 0 "
+                   "and burst time must be > 0.\n");
+            return 1;
+        }
+
+        for (int j = 0; j < i; j++) {
+            if (p[j].pid == p[i].pid) {
+                printf("Each PID must be unique.\n");
+                return 1;
+            }
+        }
+    }
+
+    nonPreemptive(p, n);
+    preemptive(p, n);
+
+    return 0;
+}
+
+
+2. Sample input for testing
+
+Enter the following processes:
+
+| PID | Arrival Time | Burst Time | Priority |
+| --- | ------------ | ---------- | -------- |
+| 1   | 0            | 7          | 3        |
+| 2   | 2            | 4          | 1        |
+| 3   | 3            | 2          | 2        |
+| 4   | 5            | 1          | 4        |
+
+3. Expected results
+
+Assuming lower numbers indicate higher priority.
+
+Non-preemptive Priority Scheduling
+
+| PID | CT | WT | TAT | RT |
+| --- | -- | -- | --- | -- |
+| 1   | 7  | 0  | 7   | 0  |
+| 2   | 11 | 5  | 9   | 5  |
+| 3   | 13 | 8  | 10  | 8  |
+| 4   | 14 | 8  | 9   | 8  |
+
+- Average Waiting Time: 5.25
+- Average Turnaround Time: 8.75
+- Average Response Time: 5.25
+
+Preemptive Priority Scheduling
+
+| PID | CT | WT | TAT | RT |
+| --- | -- | -- | --- | -- |
+| 1   | 13 | 6  | 13  | 0  |
+| 2   | 6  | 0  | 4   | 0  |
+| 3   | 8  | 3  | 5   | 3  |
+| 4   | 14 | 8  | 9   | 8  |
+
+- Average Waiting Time: 4.25
+- Average Turnaround Time: 7.75
+- Average Response Time: 2.75
+
+4. Formulas to explain during your presentation
+
+- Turnaround Time (TAT) = Completion Time − Arrival Time
+- Waiting Time (WT) = Turnaround Time − Burst Time
+- Response Time (RT) = First CPU Start Time − Arrival Time
+
+The key difference is that non-preemptive scheduling lets a selected process finish before choosing another, whereas preemptive scheduling can interrupt a running process when a higher-priority process arrives.
+
