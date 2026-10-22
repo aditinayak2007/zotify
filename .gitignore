@@ -4,6 +4,10 @@ simulator.exe
 *.exe
 *.o
 
+# Python caches
+__pycache__/
+*.pyc
+
 # Runtime logs
 yaseem.log
 nireeksha_log.txt
