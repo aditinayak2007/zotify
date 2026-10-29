@@ -1,0 +1,320 @@
+
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+
+# Page Replacement Algorithms
+def simulate(pages, capacity, algorithm):
+    frames = []
+    history = []
+    hits = 0
+    faults = 0
+    last_used = {}
+    fifo_pointer = 0
+
+    for i, page in enumerate(pages):
+        hit = page in frames
+
+        if hit:
+            hits += 1
+            last_used[page] = i
+
+        else:
+            faults += 1
+
+            if len(frames) < capacity:
+                frames.append(page)
+
+            elif algorithm == "FIFO":
+                frames[fifo_pointer] = page
+                fifo_pointer = (fifo_pointer + 1) % capacity
+
+            elif algorithm == "LRU":
+                victim = min(
+                    frames,
+                    key=lambda p: last_used.get(p, -1)
+                )
+                frames[frames.index(victim)] = page
+
+            elif algorithm == "Optimal":
+                future = pages[i + 1:]
+
+                def next_use(p):
+                    return (
+                        future.index(p)
+                        if p in future
+                        else float("inf")
+                    )
+
+                victim = max(frames, key=next_use)
+                frames[frames.index(victim)] = page
+
+            last_used[page] = i
+
+        history.append((page, frames.copy(), hit))
+
+    return history, hits, faults
+
+
+# Run Simulation
+def run_simulation():
+    try:
+        raw_pages = page_entry.get().replace(",", " ").split()
+
+        if not raw_pages:
+            raise ValueError("Enter a page-reference string.")
+
+        pages = [int(p) for p in raw_pages]
+        capacity = int(frame_entry.get())
+
+        if any(p < 0 for p in pages):
+            raise ValueError("Page numbers cannot be negative.")
+
+        if capacity < 1:
+            raise ValueError("Number of frames must be at least 1.")
+
+    except ValueError as error:
+        messagebox.showerror("Input Error", str(error))
+        return
+
+    result_tree.delete(*result_tree.get_children())
+
+    selected = algorithm_box.get()
+    algorithms = (
+        ["FIFO", "LRU", "Optimal"]
+        if selected == "Compare All"
+        else [selected]
+    )
+
+    summaries = []
+
+    for algorithm in algorithms:
+        history, hits, faults = simulate(
+            pages, capacity, algorithm
+        )
+
+        ratio = faults / len(pages) * 100
+
+        summaries.append(
+            f"{algorithm}: Hits = {hits} | "
+            f"Faults = {faults} | "
+            f"Fault Ratio = {ratio:.2f}%"
+        )
+
+        for step, (page, frames, hit) in enumerate(history, 1):
+            slots = frames + ["-"] * (capacity - len(frames))
+
+            result_tree.insert(
+                "",
+                "end",
+                values=(
+                    algorithm,
+                    step,
+                    page,
+                    " | ".join(map(str, slots)),
+                    "HIT" if hit else "FAULT"
+                ),
+                tags=("hit" if hit else "fault",)
+            )
+
+    summary_label.config(text="\n".join(summaries))
+
+
+# Clear Inputs and Results
+def clear_all():
+    page_entry.delete(0, tk.END)
+    frame_entry.delete(0, tk.END)
+    algorithm_box.set("Compare All")
+    result_tree.delete(*result_tree.get_children())
+    summary_label.config(text="Results will appear here.")
+
+
+# Main Window
+root = tk.Tk()
+root.title("Page Replacement Algorithm Simulator")
+root.geometry("1000x700")
+root.minsize(750, 550)
+root.configure(bg="#f1f5f9")
+
+style = ttk.Style()
+style.theme_use("clam")
+
+style.configure("Treeview", rowheight=28, font=("Arial", 10))
+style.configure(
+    "Treeview.Heading",
+    font=("Arial", 10, "bold")
+)
+style.configure("TButton", font=("Arial", 10, "bold"), padding=7)
+
+
+# Header
+header = tk.Frame(root, bg="#1e293b", padx=20, pady=18)
+header.pack(fill="x")
+
+tk.Label(
+    header,
+    text="PAGE REPLACEMENT SIMULATOR",
+    font=("Arial", 20, "bold"),
+    fg="white",
+    bg="#1e293b"
+).pack(anchor="w")
+
+tk.Label(
+    header,
+    text="Operating Systems | FIFO • LRU • Optimal",
+    font=("Arial", 10),
+    fg="#cbd5e1",
+    bg="#1e293b"
+).pack(anchor="w", pady=(5, 0))
+
+
+# Main Content
+main = tk.Frame(root, bg="#f1f5f9", padx=20, pady=15)
+main.pack(fill="both", expand=True)
+
+
+# User Input Section
+input_frame = tk.LabelFrame(
+    main,
+    text="Simulation Settings",
+    font=("Arial", 11, "bold"),
+    bg="white",
+    padx=15,
+    pady=12
+)
+input_frame.pack(fill="x", pady=(0, 15))
+
+tk.Label(
+    input_frame,
+    text="Page-reference string:",
+    bg="white",
+    font=("Arial", 10)
+).grid(row=0, column=0, sticky="w", padx=5, pady=8)
+
+page_entry = ttk.Entry(input_frame, width=45)
+page_entry.grid(row=0, column=1, sticky="ew", padx=8, pady=8)
+page_entry.insert(0, "7 0 1 2 0 3 0 4")
+
+tk.Label(
+    input_frame,
+    text="Number of frames:",
+    bg="white",
+    font=("Arial", 10)
+).grid(row=1, column=0, sticky="w", padx=5, pady=8)
+
+frame_entry = ttk.Entry(input_frame, width=15)
+frame_entry.grid(row=1, column=1, sticky="w", padx=8, pady=8)
+frame_entry.insert(0, "3")
+
+tk.Label(
+    input_frame,
+    text="Select algorithm:",
+    bg="white",
+    font=("Arial", 10)
+).grid(row=2, column=0, sticky="w", padx=5, pady=8)
+
+algorithm_box = ttk.Combobox(
+    input_frame,
+    values=["FIFO", "LRU", "Optimal", "Compare All"],
+    state="readonly",
+    width=20
+)
+algorithm_box.grid(row=2, column=1, sticky="w", padx=8, pady=8)
+algorithm_box.set("Compare All")
+
+input_frame.columnconfigure(1, weight=1)
+
+
+# Buttons
+button_frame = tk.Frame(input_frame, bg="white")
+button_frame.grid(
+    row=3, column=0, columnspan=2,
+    sticky="w", padx=5, pady=10
+)
+
+ttk.Button(
+    button_frame,
+    text="Run Simulation",
+    command=run_simulation
+).pack(side="left", padx=(0, 10))
+
+ttk.Button(
+    button_frame,
+    text="Clear",
+    command=clear_all
+).pack(side="left")
+
+
+# Summary Section
+summary_frame = tk.LabelFrame(
+    main,
+    text="Simulation Summary",
+    font=("Arial", 11, "bold"),
+    bg="white",
+    padx=12,
+    pady=10
+)
+summary_frame.pack(fill="x", pady=(0, 15))
+
+summary_label = tk.Label(
+    summary_frame,
+    text="Enter inputs and click Run Simulation.",
+    font=("Arial", 10),
+    justify="left",
+    anchor="w",
+    bg="white"
+)
+summary_label.pack(fill="x")
+
+
+# Results Table
+result_frame = tk.LabelFrame(
+    main,
+    text="Frame-by-Frame Results",
+    font=("Arial", 11, "bold"),
+    bg="white",
+    padx=10,
+    pady=10
+)
+result_frame.pack(fill="both", expand=True)
+
+columns = ("algorithm", "step", "page", "frames", "status")
+
+result_tree = ttk.Treeview(
+    result_frame,
+    columns=columns,
+    show="headings"
+)
+
+headings = {
+    "algorithm": ("Algorithm", 110),
+    "step": ("Step", 65),
+    "page": ("Page", 80),
+    "frames": ("Frame Contents", 260),
+    "status": ("Result", 100)
+}
+
+for column, (heading, width) in headings.items():
+    result_tree.heading(column, text=heading)
+    result_tree.column(
+        column,
+        width=width,
+        anchor="center"
+    )
+
+result_tree.tag_configure("hit", foreground="#15803d")
+result_tree.tag_configure("fault", foreground="#b91c1c")
+
+scrollbar = ttk.Scrollbar(
+    result_frame,
+    orient="vertical",
+    command=result_tree.yview
+)
+
+result_tree.configure(yscrollcommand=scrollbar.set)
+result_tree.pack(side="left", fill="both", expand=True)
+scrollbar.pack(side="right", fill="y")
+
+
+# Start Application
+root.mainloop()
