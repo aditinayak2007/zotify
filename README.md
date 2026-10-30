@@ -2,22 +2,23 @@
 
 Welcome to the **Operating Systems Project-Based Learning (PBL)** repository developed by **Aditi Nayak** (Team Leader) and team members **Anas Ahmed**, **Nireeksha**, and **Yaseem**.
 
-This repository contains four complete, verified OS simulation systems implemented in C and Python:
-1. **Week 5: Simulation and Comparative Analysis of Page Replacement Algorithms** (FIFO, LRU, Optimal algorithms, step-by-step frame contents, performance metrics, and multi-algorithm comparative analysis with Tkinter GUI & C CLI).
-2. **Week 4: Interactive Deadlock Simulation System** (Banker's Algorithm, Multi-Instance Deadlock Detection, Resource Allocation Graph canvas, and Deadlock Recovery).
+This repository is organized into five dedicated weekly folders representing the complete progression of our Operating Systems laboratory and project-based learning curriculum:
+1. **Week 1: Inter-Process Communication (IPC) Foundations & Research** (Shared Memory, Pipes, Message Passing, and Race Conditions documentation).
+2. **Week 2: Multi-Process System Simulator** (Three independent processes communicating via POSIX Pipes IPC).
 3. **Week 3: Process Scheduling Simulator** (Six CPU scheduling algorithms, ASCII Gantt charts, per-process metrics, and automated test harness).
-4. **Week 2: Multi-Process System Simulator** (Three independent processes communicating via POSIX Pipes IPC).
+4. **Week 4: Interactive Deadlock Simulation System** (Banker's Algorithm, Multi-Instance Deadlock Detection, Resource Allocation Graph canvas, and Deadlock Recovery).
+5. **Week 5: Simulation and Comparative Analysis of Page Replacement Algorithms** (FIFO, LRU, Optimal algorithms, step-by-step frame contents, performance metrics, and multi-algorithm comparative analysis with Tkinter GUI & C CLI).
 
 ---
 
 ## Team Members & Responsibilities
 
-| Team Member | Project Role | Week 2 Contribution | Week 3 Contribution | Week 4 Contribution | Week 5 Contribution |
-|:---|:---|:---|:---|:---|:---|
-| **Aditi Nayak** *(Team Leader)* | **Lead Architect & Integration Engineer** | **POSIX Pipes IPC** coordinator, descriptor hygiene, process lifecycle | **Unified Scheduling Architecture**, data structures, test suite (`test_runner.c`) | **Deadlock System Architecture**, C CLI runner, C & Python test harnesses | **Page Replacement Architecture**, C backend integration, automated verification harnesses (`test_runner.c` and `test_page_replacement.py`), documentation & GitHub delivery |
-| **Anas Ahmed** | GUI & Visualization | **UI Process** (`ui.c`) terminal REPL | **Input Module**, **FCFS** & **Round Robin** algorithms | **Tkinter GUI** (`gui.py`), interactive RAG canvas | **Tkinter GUI** (`gui.py`), frame-by-frame result table, comparison matrix, summary cards |
-| **Nireeksha** | Core Algorithms & Execution | **Core Process** (`core.c`) with CPU, memory, stack, queue | **Non-preemptive SJF**, **Preemptive SRTF**, Gantt chart | **Banker's Algorithm** (`bankers.c`), Need Matrix calculation | **FIFO Algorithm** (`fifo.c`) and **LRU Algorithm** (`lru.c`) |
-| **Yaseem** | Algorithms & Analytics | **Logging Process** (`logger.c`), file logging daemon | **Priority Scheduling**, statistical metrics | **Deadlock Detection** (`deadlock.c`), RAG logic (`rag.c`), **Recovery** (`recovery.c`) | **Optimal Algorithm** (`optimal.c`), performance metrics engine (`metrics.c`), multi-algorithm comparative analyzer |
+| Team Member | Project Role | Week 1 Contribution | Week 2 Contribution | Week 3 Contribution | Week 4 Contribution | Week 5 Contribution |
+|:---|:---|:---|:---|:---|:---|:---|
+| **Aditi Nayak** *(Team Leader)* | **Lead Architect & Integration Engineer** | IPC architectural research and documentation (`aditi_zotify.docx`) | **POSIX Pipes IPC** coordinator, descriptor hygiene, process lifecycle | **Unified Scheduling Architecture**, data structures, test suite (`test_runner.c`) | **Deadlock System Architecture**, C CLI runner, C & Python test harnesses | **Page Replacement Architecture**, C backend integration, automated verification harnesses (`test_runner.c` and `test_page_replacement.py`), documentation & GitHub delivery |
+| **Anas Ahmed** | GUI & Visualization | IPC theoretical analysis | **UI Process** (`ui.c`) terminal REPL | **Input Module**, **FCFS** & **Round Robin** algorithms | **Tkinter GUI** (`gui.py`), interactive RAG canvas | **Tkinter GUI** (`gui.py`), frame-by-frame result table, comparison matrix, summary cards |
+| **Nireeksha** | Core Algorithms & Execution | Shared Memory analysis | **Core Process** (`core.c`) with CPU, memory, stack, queue | **Non-preemptive SJF**, **Preemptive SRTF**, Gantt chart | **Banker's Algorithm** (`bankers.c`), Need Matrix calculation | **FIFO Algorithm** (`fifo.c`) and **LRU Algorithm** (`lru.c`) |
+| **Yaseem** | Algorithms & Analytics | IPC models and buffering analysis | **Logging Process** (`logger.c`), file logging daemon | **Priority Scheduling**, statistical metrics | **Deadlock Detection** (`deadlock.c`), RAG logic (`rag.c`), **Recovery** (`recovery.c`) | **Optimal Algorithm** (`optimal.c`), performance metrics engine (`metrics.c`), multi-algorithm comparative analyzer |
 
 ---
 
@@ -123,29 +124,86 @@ gcc -static -Wall -Wextra -O2 main.c ui.c core.c logger.c -o simulator.exe
 
 ---
 
+# Part 5: Week 1 — Inter-Process Communication Research
+
+Theoretical foundations, technical documentation, and comparative study of IPC mechanisms (Shared Memory, POSIX Pipes, Message Queues).
+
+---
+
 ## Repository Structure
 
 ```
 zotify/
 ├── Makefile                       # Top-level build automation (all, week2, week3, week4, week5)
-├── README.md                      # Comprehensive repository documentation
+├── README.md                      # Master repository documentation
 ├── .gitignore                     # Build and binary exclusions
 │
-├── Week 5/                        # Page Replacement Simulator (Week 5)
-│   ├── gui.py                     # Interactive Tkinter GUI (Anas Ahmed / Aditi Nayak)
-│   ├── page_replacement.h        # Unified data structures and prototypes
-│   ├── fifo.c                     # First-In, First-Out Algorithm (Nireeksha)
-│   ├── lru.c                      # Least Recently Used Algorithm (Nireeksha)
-│   ├── optimal.c                  # Optimal Page Replacement Algorithm (Yaseem)
-│   ├── metrics.c                  # Performance Metrics & Comparison (Yaseem)
-│   ├── main.c                     # Interactive C CLI Runner (Aditi Nayak)
-│   ├── test_runner.c              # Automated C Verification Harness (Aditi Nayak)
-│   ├── test_page_replacement.py   # Python Unit Test Suite (Aditi Nayak)
-│   ├── Makefile                   # Week 5 Build Configuration
+├── Week 1/                        # Inter-Process Communication Foundations (Week 1)
+│   ├── README.md                  # Week 1 Overview and Documentation Guide
+│   ├── aditi_zotify.docx          # Aditi's IPC Architectural Study
+│   ├── IPC_PBL WEEK 1.docx        # OS Course PBL Week 1 Report
+│   ├── INTERPROCESS COMMUNICATION.docx # Detailed Analysis of IPC Models
+│   ├── IPCSharedMemory_PBL.docx   # Shared Memory Implementation Analysis
+│   └── PBL                        # Project Metadata and Track Definition
+│
+├── Week 2/                        # Multi-Process Simulator with Pipes IPC (Week 2)
+│   ├── main.c                     # IPC Coordinator & Process Management (Aditi Nayak)
+│   ├── pipe_ipc.h                 # POSIX Pipes abstraction
+│   ├── ui.c / ui.h                # UI Process REPL (Anas Ahmed)
+│   ├── core.c / core.h            # Core Subsystem (Nireeksha)
+│   ├── logger.c / logger.h        # Logger Process (Yaseem)
+│   ├── Core Process               # Teammate's Original Core Process
+│   ├── Logging Process            # Teammate's Original Logging Process
+│   ├── ui nii.c                   # Teammate's Original UI Process
+│   └── Makefile                   # Week 2 Build Configuration
+│
+├── Week 3/                        # Process Scheduling Simulator (Week 3)
+│   ├── process.h                  # Common Process and Gantt data structures
+│   ├── input.c                    # Input Module (Anas Ahmed)
+│   ├── fcfs.c                     # First-Come, First-Served Algorithm (Anas Ahmed)
+│   ├── rr.c                       # Round Robin Algorithm (Anas Ahmed)
+│   ├── sjf.c                      # Non-preemptive & Preemptive SJF (Nireeksha)
+│   ├── priority.c                 # Priority Scheduling Algorithms (Yaseem)
+│   ├── gantt.c                    # Gantt Chart & Metrics Engine (Nireeksha & Yaseem)
+│   ├── main.c                     # Interactive CLI Runner (Aditi Nayak)
+│   ├── test_runner.c              # Automated C Test Harness (Aditi Nayak)
+│   ├── FCFS and Round Robin Implementation # Anas's Original Upload
+│   ├── SJF_Algorithm.c            # Nireeksha's Original SJF Upload
+│   ├── SJF_test                   # Nireeksha's Original Test File
+│   ├── Preemptive and Non Preemptive Priority Scheduling # Yaseem's Original Upload
+│   ├── Makefile                   # Week 3 Build Configuration
 │   ├── TEST_CASES.md              # Detailed Test Cases & Execution Logs
 │   └── REPORT.md                  # Comprehensive Academic Project Report
 │
-├── Week 4/                        # Deadlock Simulation System (Week 4)
-├── Week 3/                        # Process Scheduling Simulator (Week 3)
-└── Week 2/                        # Multi-Process Simulator (Week 2)
+├── Week 4/                        # Interactive Deadlock Simulation System (Week 4)
+│   ├── gui.py                     # Interactive Tkinter GUI (Anas Ahmed / Aditi Nayak)
+│   ├── bankers.h / bankers.c      # Banker's Algorithm Engine (Nireeksha)
+│   ├── deadlock.h / deadlock.c    # Multi-Instance Deadlock Detection (Yaseem)
+│   ├── rag.h / rag.c              # Resource Allocation Graph Engine (Yaseem)
+│   ├── recovery.h / recovery.c    # Deadlock Recovery Engine (Yaseem)
+│   ├── main.c                     # Interactive C CLI Runner (Aditi Nayak)
+│   ├── test_runner.c              # Automated C Verification Harness (Aditi Nayak)
+│   ├── test_deadlock.py           # Automated Python Unit Test Suite (Aditi Nayak)
+│   ├── Bankers Algorithm          # Nireeksha's Original Banker's Algorithm Upload
+│   ├── Bankers Algorithm GUI      # Anas's Original Week 4 GUI Upload
+│   ├── Deadlock Detection and Recovery # Yaseem's Original Week 4 Upload
+│   ├── Makefile                   # Week 4 Build Configuration
+│   ├── TEST_CASES.md              # Detailed Test Cases & Execution Logs
+│   └── REPORT.md                  # Comprehensive Academic Project Report
+│
+└── Week 5/                        # Page Replacement Algorithms Simulator (Week 5)
+    ├── gui.py                     # Presentation-Ready Tkinter GUI (Anas Ahmed / Aditi Nayak)
+    ├── page_replacement.h        # Unified data structures and prototypes
+    ├── fifo.c                     # First-In, First-Out Algorithm (Nireeksha)
+    ├── lru.c                      # Least Recently Used Algorithm (Nireeksha)
+    ├── optimal.c                  # Optimal Page Replacement Algorithm (Yaseem)
+    ├── metrics.c                  # Performance Metrics & Comparison (Yaseem)
+    ├── main.c                     # Interactive C CLI Runner (Aditi Nayak)
+    ├── test_runner.c              # Automated C Verification Harness (Aditi Nayak)
+    ├── test_page_replacement.py   # Python Unit Test Suite (Aditi Nayak)
+    ├── fifo_lru.c                 # Nireeksha's Original Week 5 Upload
+    ├── GUI Implementation         # Anas's Original Week 5 Upload
+    ├── Makefile                   # Week 5 Build Configuration
+    ├── TEST_CASES.md              # Detailed Test Cases & Execution Logs
+    └── REPORT.md                  # Comprehensive Academic Project Report
 ```
