@@ -19,7 +19,7 @@ test_runner.exe: test_runner.o $(OBJS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 test: test_runner.exe
-	./test_runner.exe
+	test_runner.exe
 
 clean:
 	rm -f *.o *.exe
