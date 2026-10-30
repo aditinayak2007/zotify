@@ -1,0 +1,287 @@
+#include <stdio.h>
+
+int main()
+{
+    int n, m, i, j, k;
+    int allocation[10][10], request[10][10];
+    int available[10], work[10];
+    int finish[10] = {0};
+    int deadlock[10], count = 0;
+    int choice, p, found;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    printf("Enter number of resource types: ");
+    scanf("%d", &m);
+
+    printf("\nEnter Allocation Matrix:\n");
+    for(i = 0; i < n; i++)
+        for(j = 0; j < m; j++)
+            scanf("%d", &allocation[i][j]);
+
+    printf("\nEnter Request Matrix:\n");
+    for(i = 0; i < n; i++)
+        for(j = 0; j < m; j++)
+            scanf("%d", &request[i][j]);
+
+    printf("\nEnter Available Resources:\n");
+    for(j = 0; j < m; j++)
+    {
+        scanf("%d", &available[j]);
+    }
+
+    do
+    {
+        printf("\n===== DEADLOCK MANAGEMENT =====\n");
+        printf("1. Display System State\n");
+        printf("2. Request Resources\n");
+        printf("3. Detect Deadlock\n");
+        printf("4. Recover from Deadlock\n");
+        printf("5. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch(choice)
+        {
+            case 1:
+                printf("\nAllocation Matrix:\n");
+                for(i = 0; i < n; i++)
+                {
+                    for(j = 0; j < m; j++)
+                        printf("%d ", allocation[i][j]);
+                    printf("\n");
+                }
+
+                printf("\nRequest Matrix:\n");
+                for(i = 0; i < n; i++)
+                {
+                    for(j = 0; j < m; j++)
+                        printf("%d ", request[i][j]);
+                    printf("\n");
+                }
+
+                printf("\nAvailable Resources: ");
+                for(j = 0; j < m; j++)
+                    printf("%d ", available[j]);
+
+                printf("\n");
+                break;
+
+            case 2:
+                printf("Enter process number (0 to %d): ", n - 1);
+                scanf("%d", &p);
+
+                if(p < 0 || p >= n || finish[p])
+                {
+                    printf("Invalid or terminated process.\n");
+                    break;
+                }
+
+                printf("Enter resource request:\n");
+                {
+                    int temp[10], valid = 1;
+
+                    for(j = 0; j < m; j++)
+                    {
+                        scanf("%d", &temp[j]);
+
+                        if(temp[j] < 0 || temp[j] > request[p][j])
+                            valid = 0;
+                    }
+
+                    if(!valid)
+                    {
+                        printf("Invalid request.\n");
+                        break;
+                    }
+
+                    for(j = 0; j < m; j++)
+                    {
+                        if(temp[j] > available[j])
+                            break;
+                    }
+
+                    if(j == m)
+                    {
+                        for(j = 0; j < m; j++)
+                        {
+                            available[j] -= temp[j];
+                            allocation[p][j] += temp[j];
+                            request[p][j] -= temp[j];
+                        }
+
+                        printf("Resources allocated successfully.\n");
+                    }
+                    else
+                    {
+                        printf("Resources not available. Request denied.\n");
+                    }
+                }
+                break;
+
+            case 3:
+                count = 0;
+
+                for(j = 0; j < m; j++)
+                    work[j] = available[j];
+
+                for(i = 0; i < n; i++)
+                    finish[i] = (finish[i] || 
+                        ({ int z = 1; for(j = 0; j < m; j++)
+                            if(allocation[i][j] != 0) z = 0; z; }));
+
+                for(k = 0; k < n; k++)
+                {
+                    found = 0;
+
+                    for(i = 0; i < n; i++)
+                    {
+                        if(finish[i] == 0)
+                        {
+                            for(j = 0; j < m; j++)
+                                if(request[i][j] > work[j])
+                                    break;
+
+                            if(j == m)
+                            {
+                                for(j = 0; j < m; j++)
+                                    work[j] += allocation[i][j];
+
+                                finish[i] = 1;
+                                found = 1;
+                            }
+                        }
+                    }
+
+                    if(!found)
+                        break;
+                }
+
+                for(i = 0; i < n; i++)
+                {
+                    if(finish[i] == 0)
+                        deadlock[count++] = i;
+                }
+
+                if(count == 0)
+                    printf("\nNo Deadlock Detected.\n");
+                else
+                {
+                    printf("\nDeadlock Detected!\n");
+                    printf("Deadlocked Processes: ");
+
+                    for(i = 0; i < count; i++)
+                        printf("P%d ", deadlock[i]);
+
+                    printf("\n");
+                }
+                break;
+
+            case 4:
+                count = 0;
+
+                for(j = 0; j < m; j++)
+                    work[j] = available[j];
+
+                for(i = 0; i < n; i++)
+                {
+                    int zero = 1;
+
+                    for(j = 0; j < m; j++)
+                        if(allocation[i][j] != 0)
+                            zero = 0;
+
+                    finish[i] = finish[i] || zero;
+                }
+
+                for(k = 0; k < n; k++)
+                {
+                    found = 0;
+
+                    for(i = 0; i < n; i++)
+                    {
+                        if(!finish[i])
+                        {
+                            for(j = 0; j < m; j++)
+                                if(request[i][j] > work[j])
+                                    break;
+
+                            if(j == m)
+                            {
+                                for(j = 0; j < m; j++)
+                                    work[j] += allocation[i][j];
+
+                                finish[i] = 1;
+                                found = 1;
+                            }
+                        }
+                    }
+
+                    if(!found)
+                        break;
+                }
+
+                for(i = 0; i < n; i++)
+                    if(!finish[i])
+                        deadlock[count++] = i;
+
+                if(count == 0)
+                {
+                    printf("\nNo deadlock. Recovery not required.\n");
+                }
+                else
+                {
+                    printf("\nDeadlocked Processes: ");
+
+                    for(i = 0; i < count; i++)
+                        printf("P%d ", deadlock[i]);
+
+                    printf("\nEnter process to terminate: ");
+                    scanf("%d", &p);
+
+                    found = 0;
+
+                    for(i = 0; i < count; i++)
+                        if(deadlock[i] == p)
+                            found = 1;
+
+                    if(!found)
+                    {
+                        printf("Process is not deadlocked.\n");
+                        break;
+                    }
+
+                    for(j = 0; j < m; j++)
+                    {
+                        available[j] += allocation[p][j];
+                        allocation[p][j] = 0;
+                        request[p][j] = 0;
+                    }
+
+                    finish[p] = 1;
+
+                    printf("Process P%d terminated.\n", p);
+                    printf("Resources released successfully.\n");
+
+                    printf("Updated Available Resources: ");
+
+                    for(j = 0; j < m; j++)
+                        printf("%d ", available[j]);
+
+                    printf("\n");
+                }
+                break;
+
+            case 5:
+                printf("Exiting program.\n");
+                break;
+
+            default:
+                printf("Invalid choice.\n");
+        }
+
+    } while(choice != 5);
+
+    return 0;
+}
