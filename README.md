@@ -2,103 +2,119 @@
 
 Welcome to the **Operating Systems Project-Based Learning (PBL)** repository developed by **Aditi Nayak** (Team Leader) and team members **Anas Ahmed**, **Nireeksha**, and **Yaseem**.
 
-This repository contains three complete, verified OS simulation systems implemented in C and Python:
-1. **Week 4: Interactive Deadlock Simulation System** (Banker's Algorithm, Multi-Instance Deadlock Detection, Resource Allocation Graph canvas, and Deadlock Recovery with Tkinter GUI & C CLI).
-2. **Week 3: Process Scheduling Simulator** (Six CPU scheduling algorithms, ASCII Gantt charts, per-process metrics, and automated test harness).
-3. **Week 2: Multi-Process System Simulator** (Three independent processes communicating via POSIX Pipes IPC).
+This repository contains four complete, verified OS simulation systems implemented in C and Python:
+1. **Week 5: Simulation and Comparative Analysis of Page Replacement Algorithms** (FIFO, LRU, Optimal algorithms, step-by-step frame contents, performance metrics, and multi-algorithm comparative analysis with Tkinter GUI & C CLI).
+2. **Week 4: Interactive Deadlock Simulation System** (Banker's Algorithm, Multi-Instance Deadlock Detection, Resource Allocation Graph canvas, and Deadlock Recovery).
+3. **Week 3: Process Scheduling Simulator** (Six CPU scheduling algorithms, ASCII Gantt charts, per-process metrics, and automated test harness).
+4. **Week 2: Multi-Process System Simulator** (Three independent processes communicating via POSIX Pipes IPC).
 
 ---
 
 ## Team Members & Responsibilities
 
-| Team Member | Project Role | Week 2 Technical Contribution | Week 3 Technical Contribution | Week 4 Technical Contribution |
-|:---|:---|:---|:---|:---|
-| **Aditi Nayak** *(Team Leader)* | **Lead Architect & Integration Engineer** | **POSIX Pipes IPC** coordinator, pipe lifecycle management (`pipe()`, `fork()`, `close()`, `waitpid()`), descriptor hygiene, end-to-end integration | **Unified Scheduling Architecture**, data structures (`Process`, `Gantt`, `Seg`), interactive menu orchestrator (`main.c`), automated test suite (`test_runner.c`) | **Deadlock System Architecture**, cross-platform data modeling, C CLI orchestrator (`main.c`), C test harness (`test_runner.c`), Python test suite (`test_deadlock.py`), GitHub delivery |
-| **Anas Ahmed** | GUI & Computational Scheduling | **UI Process** (`ui.c`) with interactive terminal REPL and command validation | **Input Module** (`input.c`), **FCFS** (`fcfs.c`), and **Round Robin** (`rr.c`) with configurable time quantum | **Graphical User Interface** (`gui.py`), interactive RAG canvas with animated nodes and edges, system status badge, diagnostic trace log |
-| **Nireeksha** | Banker's Algorithm & Core Execution | **Core Process** (`core.c`) implementing CPU engine, Memory subsystem, Stack, and Queue | **Non-preemptive SJF**, **Preemptive SRTF** (`sjf.c`), and **ASCII Gantt Chart** renderer (`gantt.c`) | **Banker's Algorithm** (`bankers.c`), Need Matrix calculation ($\text{Need} = \text{Max} - \text{Alloc}$), safe/unsafe state analysis, safe sequence generation |
-| **Yaseem** | Deadlock Detection, RAG, & Recovery | **Logging Process** (`logger.c`) with file persistence daemon (`yaseem.log`) | **Non-preemptive Priority**, **Preemptive Priority** (`priority.c`), and statistical metrics computation | **Deadlock Detection** (`deadlock.c`), Resource Allocation Graph logic (`rag.c`), Wait-For cycle detection, and **Deadlock Recovery** (`recovery.c`) |
+| Team Member | Project Role | Week 2 Contribution | Week 3 Contribution | Week 4 Contribution | Week 5 Contribution |
+|:---|:---|:---|:---|:---|:---|
+| **Aditi Nayak** *(Team Leader)* | **Lead Architect & Integration Engineer** | **POSIX Pipes IPC** coordinator, descriptor hygiene, process lifecycle | **Unified Scheduling Architecture**, data structures, test suite (`test_runner.c`) | **Deadlock System Architecture**, C CLI runner, C & Python test harnesses | **Page Replacement Architecture**, C backend integration, automated verification harnesses (`test_runner.c` and `test_page_replacement.py`), documentation & GitHub delivery |
+| **Anas Ahmed** | GUI & Visualization | **UI Process** (`ui.c`) terminal REPL | **Input Module**, **FCFS** & **Round Robin** algorithms | **Tkinter GUI** (`gui.py`), interactive RAG canvas | **Tkinter GUI** (`gui.py`), frame-by-frame result table, comparison matrix, summary cards |
+| **Nireeksha** | Core Algorithms & Execution | **Core Process** (`core.c`) with CPU, memory, stack, queue | **Non-preemptive SJF**, **Preemptive SRTF**, Gantt chart | **Banker's Algorithm** (`bankers.c`), Need Matrix calculation | **FIFO Algorithm** (`fifo.c`) and **LRU Algorithm** (`lru.c`) |
+| **Yaseem** | Algorithms & Analytics | **Logging Process** (`logger.c`), file logging daemon | **Priority Scheduling**, statistical metrics | **Deadlock Detection** (`deadlock.c`), RAG logic (`rag.c`), **Recovery** (`recovery.c`) | **Optimal Algorithm** (`optimal.c`), performance metrics engine (`metrics.c`), multi-algorithm comparative analyzer |
 
 ---
 
-# Part 1: Week 4 — Interactive Deadlock Simulation System
+# Part 1: Week 5 — Page Replacement Algorithms Simulator
 
-The Week 4 project models resource allocation, deadlock avoidance, detection, and recovery in modern multi-resource Operating Systems.
+The Week 5 project simulates and comparatively analyzes page replacement policies in demand-paged virtual memory systems.
 
-### Key Features
-1. **Banker's Algorithm (Deadlock Avoidance):**
-   - Automatically computes Need Matrix: $\text{Need}[i][j] = \text{Max}[i][j] - \text{Allocation}[i][j]$.
-   - Validates system safety and displays complete safe execution sequence (e.g. $P_1 \to P_3 \to P_4 \to P_0 \to P_2$).
-   - Validates resource requests against remaining need and available resources; rolls back unsafe requests.
-2. **Multi-Instance Deadlock Detection:**
-   - Evaluates current allocations and outstanding requests using the Work/Finish algorithm.
-   - Accurately identifies all deadlocked processes.
-   - Distinguishes between unsafe states (future risk) and active deadlocks (present circular wait).
-3. **Resource Allocation Graph (RAG) Visualization:**
-   - Visual Tkinter Canvas displaying processes as circles and resources as rounded rectangles with available counters.
-   - Renders directed solid allocation edges ($R_j \to P_i$) and dashed request edges ($P_i \to R_j$).
-   - Dynamically highlights deadlocked nodes and cycles in bright red.
-4. **Deadlock Recovery:**
-   - **Auto-Greedy Abort:** Automatically identifies and terminates the deadlocked process holding the largest allocation to maximize resource reclamation.
-   - **Manual Abort:** Allows the operator to designate a specific victim process.
-   - Automatically reclaims resources and re-runs deadlock detection to verify recovery.
+### Supported Algorithms
+1. **FIFO (First-In, First-Out):** Evicts the oldest loaded page using a circular replacement pointer.
+2. **LRU (Least Recently Used):** Evicts the page unreferenced for the longest period in the past using access timestamps.
+3. **Optimal (OPT / MIN):** Evicts the page that will not be accessed for the longest period in the future (Bélády's optimal benchmark).
 
-### How to Run Week 4
+### Performance Metrics & Formulas
+- **Total Page References ($N$):** Number of page requests in the sequence.
+- **Total Page Hits ($H$):** References where the page was already resident in memory.
+- **Total Page Faults ($F$):** References where the page was missing from memory frames.
+- **Hit Ratio ($HR$):**
+  $$\text{Hit Ratio} = \left( \frac{\text{Page Hits}}{\text{Total Page References}} \right) \times 100\%$$
+- **Fault Ratio ($FR$):**
+  $$\text{Fault Ratio} = \left( \frac{\text{Page Faults}}{\text{Total Page References}} \right) \times 100\%$$
+- **Fundamental Invariant:** $\text{Page Hits} + \text{Page Faults} = \text{Total References}$.
+
+### Course Specification Sample Benchmark
+- **Page-Reference String:** `7 0 1 2 0 3 0 4 2 3`
+- **Number of Frames:** 3
+
+| Algorithm | Total References | Page Hits | Page Faults | Hit Ratio (%) | Fault Ratio (%) | Outcome |
+|:---|:---:|:---:|:---:|:---:|:---:|:---|
+| **FIFO** | 10 | 1 | 9 | 10.00% | 90.00% | Highest fault count |
+| **LRU** | 10 | 2 | 8 | 20.00% | 80.00% | 100% improvement over FIFO |
+| **Optimal** | 10 | **4** | **6** | **40.00%** | **60.00%** | **★ Best Performance (Lowest Faults: 6)** |
+
+### How to Run Week 5
 
 #### 1. Interactive Desktop GUI (Python Tkinter)
 ```powershell
-cd "Week 4"
+cd "Week 5"
 py gui.py
 ```
 
 #### 2. Native C CLI Simulator (MinGW GCC)
 ```powershell
-cd "Week 4"
-gcc -Wall -Wextra -O2 -o deadlock_sim.exe main.c bankers.c deadlock.c rag.c recovery.c
-.\deadlock_sim.exe
+cd "Week 5"
+gcc -Wall -Wextra -O2 -o page_sim.exe main.c fifo.c lru.c optimal.c metrics.c
+.\page_sim.exe
 ```
 
 #### 3. Automated Test Suites
 ```powershell
-# Run C Verification Harness (9 Test Suites, 21 Assertions)
-cd "Week 4"
-gcc -Wall -Wextra -O2 -o test_runner.exe test_runner.c bankers.c deadlock.c rag.c recovery.c
+# C Test Runner (34 assertions)
+cd "Week 5"
+gcc -Wall -Wextra -O2 -o test_runner.exe test_runner.c fifo.c lru.c optimal.c metrics.c
 .\test_runner.exe
 
-# Run Python Unit Test Suite
-py test_deadlock.py
+# Python Unit Test Suite (7 unit tests)
+py test_page_replacement.py
 ```
 
 ---
 
-# Part 2: Week 3 — Process Scheduling Simulator
+# Part 2: Week 4 — Interactive Deadlock Simulation System
 
-The Week 3 simulator models CPU scheduling dynamics across six classic algorithms:
-1. **First-Come, First-Served (FCFS)**
-2. **Shortest Job First (Non-preemptive SJF)**
-3. **Shortest Remaining Time First (Preemptive SRTF)**
-4. **Non-preemptive Priority Scheduling** ($1 = \text{Highest Priority}$)
-5. **Preemptive Priority Scheduling** ($1 = \text{Highest Priority}$)
-6. **Round Robin (RR)** with configurable time quantum $q$
+The Week 4 project models resource allocation, deadlock avoidance, detection, and recovery.
 
-### Building and Running Week 3
+### Features
+1. **Banker's Algorithm (Avoidance):** Need Matrix calculation ($\text{Need} = \text{Max} - \text{Alloc}$), safety sequence analysis, and request evaluation with rollback.
+2. **Deadlock Detection:** Multi-instance resource deadlock detection algorithm.
+3. **Resource Allocation Graph (RAG):** Interactive visual canvas with cycle detection.
+4. **Deadlock Recovery:** Auto-Greedy and manual process termination with resource reclamation.
+
+### Running Week 4
+```powershell
+cd "Week 4"
+py gui.py          # Desktop GUI
+.\deadlock_sim.exe # C CLI
+```
+
+---
+
+# Part 3: Week 3 — Process Scheduling Simulator
+
+Models 6 CPU scheduling algorithms: FCFS, SJF (Non-preemptive & Preemptive/SRTF), Priority (Non-preemptive & Preemptive), and Round Robin ($q$).
+
+### Running Week 3
 ```powershell
 cd "Week 3"
 gcc -Wall -Wextra -O2 -o scheduler.exe main.c input.c gantt.c fcfs.c sjf.c priority.c rr.c
 .\scheduler.exe
-
-# Automated Test Suite
-gcc -Wall -Wextra -O2 -o test_runner.exe test_runner.c gantt.c fcfs.c sjf.c priority.c rr.c
-.\test_runner.exe
 ```
 
 ---
 
-# Part 3: Week 2 — Multi-Process Simulator (Pipes IPC)
+# Part 4: Week 2 — Multi-Process Simulator (Pipes IPC)
 
-The Week 2 simulator models a modular computer architecture separated into three concurrent processes communicating via POSIX Pipes:
-$$\text{User} \longrightarrow \text{UI Process} \overset{\text{Pipe}}{\rightleftharpoons} \text{Core Process (CPU/Memory/Stack/Queue)} \overset{\text{Pipe}}{\longrightarrow} \text{Logging Process} \longrightarrow \text{yaseem.log}$$
+Models UI, Core, and Logger processes communicating via POSIX Pipes IPC.
 
-### Building and Running Week 2
+### Running Week 2
 ```powershell
 cd "Week 2"
 gcc -static -Wall -Wextra -O2 main.c ui.c core.c logger.c -o simulator.exe
@@ -111,36 +127,25 @@ gcc -static -Wall -Wextra -O2 main.c ui.c core.c logger.c -o simulator.exe
 
 ```
 zotify/
-├── Makefile                       # Top-level build automation (all, week2, week3, week4, test, clean)
+├── Makefile                       # Top-level build automation (all, week2, week3, week4, week5)
 ├── README.md                      # Comprehensive repository documentation
 ├── .gitignore                     # Build and binary exclusions
-├── Bankers Algorithm              # Teammate Nireeksha's original Banker's Algorithm upload
 │
-├── Week 4/                        # Interactive Deadlock Simulation System
-│   ├── gui.py                     # Interactive Tkinter Graphical User Interface (Anas Ahmed)
-│   ├── bankers.h / bankers.c      # Banker's Algorithm & Need Matrix Engine (Nireeksha)
-│   ├── deadlock.h / deadlock.c    # Multi-Instance Deadlock Detection Algorithm (Yaseem)
-│   ├── rag.h / rag.c              # Resource Allocation Graph Engine (Yaseem)
-│   ├── recovery.h / recovery.c    # Deadlock Recovery Engine (Yaseem)
+├── Week 5/                        # Page Replacement Simulator (Week 5)
+│   ├── gui.py                     # Interactive Tkinter GUI (Anas Ahmed / Aditi Nayak)
+│   ├── page_replacement.h        # Unified data structures and prototypes
+│   ├── fifo.c                     # First-In, First-Out Algorithm (Nireeksha)
+│   ├── lru.c                      # Least Recently Used Algorithm (Nireeksha)
+│   ├── optimal.c                  # Optimal Page Replacement Algorithm (Yaseem)
+│   ├── metrics.c                  # Performance Metrics & Comparison (Yaseem)
 │   ├── main.c                     # Interactive C CLI Runner (Aditi Nayak)
 │   ├── test_runner.c              # Automated C Verification Harness (Aditi Nayak)
-│   ├── test_deadlock.py           # Automated Python Unit Test Suite (Aditi Nayak)
-│   ├── Makefile                   # Week 4 Build Automation
+│   ├── test_page_replacement.py   # Python Unit Test Suite (Aditi Nayak)
+│   ├── Makefile                   # Week 5 Build Configuration
 │   ├── TEST_CASES.md              # Detailed Test Cases & Execution Logs
 │   └── REPORT.md                  # Comprehensive Academic Project Report
 │
-├── Week 3/                        # Process Scheduling Simulator
-│   ├── process.h                  # Common Process and Gantt data structures
-│   ├── input.c / fcfs.c / rr.c    # Anas's scheduling algorithms
-│   ├── sjf.c / gantt.c            # Nireeksha's SJF and Gantt chart
-│   ├── priority.c                 # Yaseem's priority algorithms
-│   ├── main.c / test_runner.c     # Aditi's orchestrator and test suite
-│   ├── TEST_CASES.md / REPORT.md  # Week 3 Documentation
-│   └── Makefile                   # Week 3 build configuration
-│
-└── Week 2/                        # Multi-Process Simulator (Pipes IPC)
-    ├── main.c                     # IPC Coordinator & Process Management (Aditi Nayak)
-    ├── pipe_ipc.h                 # POSIX Pipes abstraction
-    ├── ui.c / core.c / logger.c   # Subsystem implementations
-    └── Makefile                   # Week 2 build configuration
+├── Week 4/                        # Deadlock Simulation System (Week 4)
+├── Week 3/                        # Process Scheduling Simulator (Week 3)
+└── Week 2/                        # Multi-Process Simulator (Week 2)
 ```
