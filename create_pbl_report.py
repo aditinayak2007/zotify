@@ -182,6 +182,105 @@ def add_member_commit_box(doc, member_name, commit_info=None, image_path=None):
     p_sp.paragraph_format.space_before = Pt(0)
     p_sp.paragraph_format.space_after = Pt(4)
 
+def add_notes_box(doc, submitted_by, doc_title, notes_paragraphs, summary_table=None):
+    p_sub = doc.add_paragraph()
+    p_sub.paragraph_format.space_before = Pt(8)
+    p_sub.paragraph_format.space_after = Pt(2)
+    p_sub.paragraph_format.keep_with_next = True
+    
+    r_sub = p_sub.add_run(f"Submitted by: {submitted_by} ({doc_title})")
+    r_sub.font.name = 'Calibri'
+    r_sub.font.size = Pt(10)
+    r_sub.font.bold = True
+    r_sub.font.color.rgb = RGBColor(27, 54, 93)
+    
+    table = doc.add_table(rows=1, cols=1)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    cell = table.cell(0, 0)
+    cell.width = Inches(6.5)
+    set_cell_background(cell, "F8FAFC")
+    set_cell_margins(cell, top=100, bottom=100, left=140, right=140)
+    
+    tcPr = cell._tc.get_or_add_tcPr()
+    borders = parse_xml(
+        f'<w:tcBorders {nsdecls("w")}>'
+        f'<w:top w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>'
+        f'<w:bottom w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>'
+        f'<w:left w:val="single" w:sz="12" w:space="0" w:color="2C5282"/>'
+        f'<w:right w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>'
+        f'</w:tcBorders>'
+    )
+    tcPr.append(borders)
+    
+    # First paragraph in cell
+    p_first = cell.paragraphs[0]
+    p_first.paragraph_format.space_before = Pt(0)
+    p_first.paragraph_format.space_after = Pt(4)
+    p_first.paragraph_format.line_spacing = 1.15
+    
+    for i, item in enumerate(notes_paragraphs):
+        p_target = p_first if i == 0 else cell.add_paragraph()
+        p_target.paragraph_format.space_before = Pt(0)
+        p_target.paragraph_format.space_after = Pt(4)
+        p_target.paragraph_format.line_spacing = 1.15
+        
+        # Check for bold headings or bullets
+        if isinstance(item, tuple):
+            prefix, text = item
+            r_pre = p_target.add_run(prefix)
+            r_pre.font.name = 'Calibri'
+            r_pre.font.size = Pt(10)
+            r_pre.font.bold = True
+            r_pre.font.color.rgb = RGBColor(27, 54, 93)
+            
+            r_txt = p_target.add_run(text)
+            r_txt.font.name = 'Calibri'
+            r_txt.font.size = Pt(9.5)
+            r_txt.font.color.rgb = RGBColor(45, 55, 72)
+        elif item.startswith("•"):
+            p_target.paragraph_format.left_indent = Inches(0.2)
+            r_txt = p_target.add_run(item)
+            r_txt.font.name = 'Calibri'
+            r_txt.font.size = Pt(9.5)
+            r_txt.font.color.rgb = RGBColor(45, 55, 72)
+        else:
+            r_txt = p_target.add_run(item)
+            r_txt.font.name = 'Calibri'
+            r_txt.font.size = Pt(9.5)
+            if any(item.startswith(kw) for kw in ["Inter-Process Communication", "Pipes in IPC", "Shared Memory", "Sockets:", "Message Queues", "Definition:"]):
+                r_txt.font.bold = True
+                r_txt.font.color.rgb = RGBColor(27, 54, 93)
+            else:
+                r_txt.font.color.rgb = RGBColor(45, 55, 72)
+                
+    if summary_table:
+        p_tbl_lbl = cell.add_paragraph()
+        p_tbl_lbl.paragraph_format.space_before = Pt(6)
+        p_tbl_lbl.paragraph_format.space_after = Pt(3)
+        r_tbl_lbl = p_tbl_lbl.add_run("Summary Table:")
+        r_tbl_lbl.font.name = 'Calibri'
+        r_tbl_lbl.font.size = Pt(9.5)
+        r_tbl_lbl.font.bold = True
+        r_tbl_lbl.font.color.rgb = RGBColor(27, 54, 93)
+        
+        inner_table = cell.add_table(rows=len(summary_table), cols=2)
+        set_table_borders(inner_table, color="D1D5DB")
+        inner_widths = [Inches(1.8), Inches(4.3)]
+        
+        for r_idx, row_vals in enumerate(summary_table):
+            row_obj = inner_table.rows[r_idx]
+            for c_idx, val in enumerate(row_vals):
+                row_obj.cells[c_idx].text = val
+                row_obj.cells[c_idx].width = inner_widths[c_idx]
+            if r_idx == 0:
+                format_row(row_obj, is_header=True, bg_color="E2E8F0")
+            else:
+                format_row(row_obj, bg_color="FFFFFF" if r_idx % 2 == 1 else "F8FAFC")
+                
+    p_sp = doc.add_paragraph()
+    p_sp.paragraph_format.space_before = Pt(0)
+    p_sp.paragraph_format.space_after = Pt(4)
+
 def add_code_section(doc, submitted_by, code_content=None, filename=None):
     p_sub = doc.add_paragraph()
     p_sub.paragraph_format.space_before = Pt(8)
@@ -359,7 +458,7 @@ def build_document():
     r_inst3.font.bold = True
     r_inst3.font.color.rgb = RGBColor(45, 55, 72)
     
-    # College Logo Picture (Inserted Centered)
+    # College Logo Picture (Centered)
     p_logo = doc.add_paragraph()
     p_logo.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_logo.paragraph_format.space_before = Pt(4)
@@ -567,165 +666,77 @@ def build_document():
         
     add_body_p(doc, "Each member studied and wrote notes on the IPC techniques they were assigned. The notes are documents kept in the repository's Week 1 directory.")
     
-    add_heading_2(doc, "Code")
-    pipe_sample = """// Week 1: Pipes IPC Implementation (pipe_ipc.c)
-// Submitted by: Aditi Nayak (25192102)
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
-int main() {
-    int fd[2]; // fd[0]: read end, fd[1]: write end
-    pid_t pid;
-    char write_msg[] = "Hello from Parent via Pipe!";
-    char read_msg[100];
-
-    if (pipe(fd) == -1) {
-        perror("Pipe creation failed");
-        return 1;
-    }
-
-    pid = fork();
-    if (pid < 0) {
-        perror("Fork failed");
-        return 1;
-    }
-
-    if (pid > 0) { // Parent process
-        close(fd[0]); // Close unused read end
-        printf("[Parent] Writing message to pipe: '%s'\\n", write_msg);
-        write(fd[1], write_msg, strlen(write_msg) + 1);
-        close(fd[1]);
-        wait(NULL);
-    } else { // Child process
-        close(fd[1]); // Close unused write end
-        read(fd[0], read_msg, sizeof(read_msg));
-        printf("[Child] Read message from pipe: '%s'\\n", read_msg);
-        close(fd[0]);
-        exit(0);
-    }
-    return 0;
-}"""
-    add_code_section(doc, "Aditi Nayak", code_content=pipe_sample, filename="pipe_ipc.c")
+    # WEEK 1: NOTES & THEORY SUBMISSIONS (Instead of Code, as requested)
+    add_heading_2(doc, "Notes and Theory Submissions (Uploaded to GitHub)")
     
-    shm_sample = """// Week 1: Shared Memory IPC Implementation (shm_ipc.c)
-// Submitted by: Nireeksha
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-
-#define SHM_NAME "/pbl_shared_mem"
-#define SHM_SIZE 1024
-
-int main() {
-    pid_t pid;
-    int shm_fd;
-    char *ptr;
-
-    shm_fd = shm_open(SHM_NAME, O_CREAT | O_RDWR, 0666);
-    ftruncate(shm_fd, SHM_SIZE);
-    ptr = (char *)mmap(0, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-
-    pid = fork();
-    if (pid > 0) { // Parent writes
-        const char *msg = "Shared Memory Data Segment: OSCO PBL Week 1";
-        sprintf(ptr, "%s", msg);
-        printf("[Parent] Written to Shared Memory: '%s'\\n", msg);
-        wait(NULL);
-        shm_unlink(SHM_NAME);
-    } else if (pid == 0) { // Child reads
-        sleep(1);
-        printf("[Child] Read from Shared Memory: '%s'\\n", ptr);
-        exit(0);
-    }
-    return 0;
-}"""
-    add_code_section(doc, "Nireeksha", code_content=shm_sample, filename="shm_ipc.c")
+    # 1. Aditi's Notes
+    aditi_notes = [
+        ("Name: ", "Aditi Nayak  |  Register Number: 25192102"),
+        ("Inter-Process Communication (IPC): ", "Inter-Process Communication (IPC) is a mechanism that allows two or more processes to communicate and exchange data with each other."),
+        ("Simple Example: ", "Suppose Process A calculates a student's marks and Process B calculates the grade. IPC allows Process A to send the marks to Process B."),
+        ("Pipes in IPC: ", "A pipe is an IPC technique used to transfer data from one process to another. It works like a communication channel where one process writes data into the pipe and another process reads the data from it."),
+        ("Data Flow: ", "Process A  →  Pipe  →  Process B"),
+        ("Key Points:", ""),
+        "• Usually used for communication between related processes.",
+        "• Data flows through the pipe in a stream.",
+        "• One process writes, while the other process reads.",
+        "• Pipes are commonly used in operating systems.",
+        ("Example in Practice: ", "A parent process sends a message like 'Hello' through a pipe, and the child process reads that message.")
+    ]
+    add_notes_box(doc, "Aditi Nayak (Team Leader)", "aditi_zotify.docx - Pipes in IPC", aditi_notes)
     
-    socket_sample = """// Week 1: Socket IPC Implementation (socket_ipc.c)
-// Submitted by: Anas Ahmed
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-
-#define PORT 8080
-
-void run_server() {
-    int server_fd, new_socket;
-    struct sockaddr_in address;
-    int opt = 1, addrlen = sizeof(address);
-    char buffer[1024] = {0};
-
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
-
-    bind(server_fd, (struct sockaddr *)&address, sizeof(address));
-    listen(server_fd, 3);
-    printf("[Server] Listening on port %d...\\n", PORT);
-    new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
-    read(new_socket, buffer, 1024);
-    printf("[Server] Received: '%s'\\n", buffer);
-    send(new_socket, "ACK from Server", 15, 0);
-    close(new_socket);
-    close(server_fd);
-}"""
-    add_code_section(doc, "Anas Ahmed", code_content=socket_sample, filename="socket_ipc.c")
+    # 2. Anas Ahmed's Notes
+    anas_notes = [
+        ("INTERPROCESS COMMUNICATION", ""),
+        ("Definition: ", "Interprocess Communication (IPC) is a method that allows two or more processes to communicate with each other. It helps processes exchange data and work together by using communication methods provided by the operating system."),
+        ("Technique of Interprocess Communication — Sockets:", ""),
+        ("What are Sockets: ", "Sockets are used when two processes need to communicate with each other. They can be used between processes running on the same computer or between computers connected through a network."),
+        ("How Sockets Work: ", "A socket acts as an endpoint through which one process can send and receive data from another process. In network communication, a socket is usually identified using an IP address and a port number."),
+        ("Example: ", "In a client-server application, the client connects to the server using its IP address and port number. They can then exchange messages through the socket. After the communication is completed, the connection can be closed.")
+    ]
+    add_notes_box(doc, "Anas Ahmed", "INTERPROCESS COMMUNICATION.docx - Sockets in IPC", anas_notes)
     
-    mq_sample = """// Week 1: POSIX Message Queue Implementation (msgqueue_ipc.c)
-// Submitted by: Yaseem
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <mqueue.h>
-#include <unistd.h>
-
-#define QUEUE_NAME "/pbl_msg_queue"
-#define MAX_SIZE 128
-
-int main() {
-    mqd_t mq;
-    struct mq_attr attr;
-    char buffer[MAX_SIZE];
-
-    attr.mq_flags = 0;
-    attr.mq_maxmsg = 10;
-    attr.mq_msgsize = MAX_SIZE;
-    attr.mq_curmsgs = 0;
-
-    mq = mq_open(QUEUE_NAME, O_CREAT | O_RDWR, 0644, &attr);
-    if (fork() > 0) { // Sender
-        const char *msg = "Message Queue Payload";
-        mq_send(mq, msg, strlen(msg) + 1, 1);
-        printf("[Sender] Sent message: '%s'\\n", msg);
-        sleep(1);
-        mq_close(mq);
-        mq_unlink(QUEUE_NAME);
-    } else { // Receiver
-        sleep(1);
-        mq_receive(mq, buffer, MAX_SIZE, NULL);
-        printf("[Receiver] Retrieved message: '%s'\\n", buffer);
-        mq_close(mq);
-        exit(0);
-    }
-    return 0;
-}"""
-    add_code_section(doc, "Yaseem", code_content=mq_sample, filename="msgqueue_ipc.c")
+    # 3. Nireeksha's Notes
+    nireeksha_notes = [
+        ("Inter-Process Communication (IPC) and Shared Memory", ""),
+        ("Inter-Process Communication (IPC): ", "Inter-Process Communication (IPC) is a set of mechanisms that allows two or more processes to communicate and exchange data with each other. Since processes normally have separate memory spaces, IPC provides a way for them to share information and coordinate their activities. Common IPC methods include pipes, message queues, shared memory, and sockets."),
+        ("Shared Memory: ", "Shared Memory is an IPC method in which two or more processes share a common memory area to exchange data. The operating system creates or maps a shared memory region that can be accessed by the participating processes."),
+        ("Performance & Synchronization: ", "Because the data is placed in memory directly, shared memory is very fast and is suitable for exchanging large amounts of data. However, processes must use synchronization mechanisms such as semaphores or mutexes to prevent conflicts when accessing the shared data."),
+        ("In Simple Terms: ", "Processes  →  Common Shared Memory  →  Exchange Data")
+    ]
+    add_notes_box(doc, "Nireeksha", "IPCSharedMemory_PBL.docx - Shared Memory in IPC", nireeksha_notes)
+    
+    # 4. Yaseem's Notes
+    yaseem_notes = [
+        ("Inter-Process Communication (IPC)", ""),
+        ("1. Definition: ", "Inter-Process Communication (IPC) is a set of mechanisms provided by an operating system that allows two or more processes to communicate with each other and exchange data."),
+        ("Purpose of IPC:", ""),
+        "• To exchange information between processes.",
+        "• To coordinate and synchronize the activities of processes.",
+        "• To allow processes to work together to complete a task.",
+        ("Common IPC Methods: ", "Message Queues, Pipes, Shared Memory, Sockets, Signals."),
+        ("2. Message Queues:", ""),
+        ("Definition: ", "A message queue is an IPC mechanism in which processes communicate by sending and receiving messages through a queue managed by the operating system."),
+        ("How It Works:", ""),
+        "• A sending process creates a message containing the required information.",
+        "• The message is placed into a message queue.",
+        "• The receiving process retrieves the message from the queue.",
+        "• The processes do not need to directly share the same memory.",
+        ("Example: ", "Process A wants to send data to Process B. Process A places the data as a message in the queue. Process B later reads the message from the queue and processes the data."),
+        ("Advantages of Message Queues:", ""),
+        "• Simple method for exchanging data between processes.",
+        "• Processes can communicate without sharing memory directly.",
+        "• Messages can be stored temporarily until the receiving process is ready.",
+        "• Useful for communication between independent processes."
+    ]
+    yaseem_summary_table = [
+        ["Topic", "Meaning"],
+        ["IPC", "Allows processes to communicate and exchange data."],
+        ["Message Queue", "Allows processes to communicate by sending and receiving messages through a queue."],
+        ["Sender", "Process that places a message into the queue."],
+        ["Receiver", "Process that retrieves and processes a message from the queue."]
+    ]
+    add_notes_box(doc, "Yaseem", "IPC_PBL WEEK 1.docx - Message Queues and Signals", yaseem_notes, summary_table=yaseem_summary_table)
     
     add_outcomes_section(doc, [
         "Why processes need IPC: separate address spaces cannot share data directly.",
@@ -1069,24 +1080,25 @@ int main() {
     ])
     
     # Save locations
+    dest_complete = r"C:\pbl\Report_on_Project_Based_Learning_Complete.docx"
     dest_final = r"C:\pbl\Report_on_Project_Based_Learning_Final.docx"
-    dest1 = r"C:\pbl\Report_on_Project_Based_Learning_Updated.docx"
-    dest1_orig = r"C:\pbl\Report_on_Project_Based_Learning.docx"
-    dest2 = os.path.join(base_dir, "Report_on_Project_Based_Learning.docx")
+    dest_upd = r"C:\pbl\Report_on_Project_Based_Learning_Updated.docx"
+    dest_orig = r"C:\pbl\Report_on_Project_Based_Learning.docx"
+    dest_repo = os.path.join(base_dir, "Report_on_Project_Based_Learning.docx")
     
     os.makedirs(r"C:\pbl", exist_ok=True)
-    doc.save(dest_final)
-    print(f"Successfully generated and saved final report at: {dest_final}")
+    doc.save(dest_complete)
+    print(f"Successfully generated and saved complete report at: {dest_complete}")
 
-    for target in [dest1, dest1_orig]:
+    for target in [dest_final, dest_upd, dest_orig]:
         try:
             doc.save(target)
             print(f"Successfully updated: {target}")
         except PermissionError:
-            print(f"[Note] {target} is currently open in Word.")
+            print(f"[Note] {target} is currently open in Word. Skipped overwriting locked file.")
     
-    doc.save(dest2)
-    print(f"Successfully saved copy in repository at: {dest2}")
+    doc.save(dest_repo)
+    print(f"Successfully saved copy in repository at: {dest_repo}")
 
 if __name__ == "__main__":
     build_document()
