@@ -41,7 +41,7 @@ def format_row(row, heights=None, is_header=False, bg_color=None):
                 p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 for run in p.runs:
                     run.font.name = 'Calibri'
-                    run.font.size = Pt(10.5)
+                    run.font.size = Pt(10)
                     run.font.bold = True
                     run.font.color.rgb = RGBColor(27, 54, 93)
     else:
@@ -53,29 +53,29 @@ def format_row(row, heights=None, is_header=False, bg_color=None):
             for p in cell.paragraphs:
                 for run in p.runs:
                     run.font.name = 'Calibri'
-                    run.font.size = Pt(10)
+                    run.font.size = Pt(9.5)
                     run.font.color.rgb = RGBColor(45, 55, 72)
 
 def add_heading_1(doc, text):
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(14)
-    p.paragraph_format.space_after = Pt(4)
+    p.paragraph_format.space_after = Pt(3)
     p.paragraph_format.keep_with_next = True
     run = p.add_run(text)
     run.font.name = 'Calibri'
-    run.font.size = Pt(16)
+    run.font.size = Pt(15)
     run.font.bold = True
     run.font.color.rgb = RGBColor(27, 54, 93)
     return p
 
 def add_heading_2(doc, text):
     p = doc.add_paragraph()
-    p.paragraph_format.space_before = Pt(12)
-    p.paragraph_format.space_after = Pt(4)
+    p.paragraph_format.space_before = Pt(11)
+    p.paragraph_format.space_after = Pt(3)
     p.paragraph_format.keep_with_next = True
     run = p.add_run(text)
     run.font.name = 'Calibri'
-    run.font.size = Pt(13)
+    run.font.size = Pt(12)
     run.font.bold = True
     run.font.color.rgb = RGBColor(44, 82, 130)
     return p
@@ -92,7 +92,7 @@ def add_heading_3(doc, text):
     run.font.color.rgb = RGBColor(43, 108, 176)
     return p
 
-def add_body_p(doc, text, bold_prefix=None, space_after=6):
+def add_body_p(doc, text, bold_prefix=None, space_after=5):
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(0)
     p.paragraph_format.space_after = Pt(space_after)
@@ -100,51 +100,73 @@ def add_body_p(doc, text, bold_prefix=None, space_after=6):
     if bold_prefix:
         r_pre = p.add_run(bold_prefix)
         r_pre.font.name = 'Calibri'
-        r_pre.font.size = Pt(10.5)
+        r_pre.font.size = Pt(10)
         r_pre.font.bold = True
         r_pre.font.color.rgb = RGBColor(30, 41, 59)
     run = p.add_run(text)
     run.font.name = 'Calibri'
-    run.font.size = Pt(10.5)
+    run.font.size = Pt(10)
     run.font.color.rgb = RGBColor(51, 65, 85)
     return p
 
-def add_question_box(doc, question_text):
+def add_question_box(doc, question_text, week_brief=None):
     p = doc.add_paragraph()
-    p.paragraph_format.space_before = Pt(6)
-    p.paragraph_format.space_after = Pt(8)
+    p.paragraph_format.space_before = Pt(4)
+    p.paragraph_format.space_after = Pt(2)
     p.paragraph_format.line_spacing = 1.15
-    r_q = p.add_run("Question: ")
+    r_q = p.add_run("Question")
     r_q.font.name = 'Calibri'
     r_q.font.size = Pt(10.5)
     r_q.font.bold = True
     r_q.font.color.rgb = RGBColor(27, 54, 93)
     
-    r_txt = p.add_run(question_text)
+    p_q = doc.add_paragraph()
+    p_q.paragraph_format.space_before = Pt(0)
+    p_q.paragraph_format.space_after = Pt(4)
+    p_q.paragraph_format.line_spacing = 1.15
+    r_txt = p_q.add_run(question_text)
     r_txt.font.name = 'Calibri'
-    r_txt.font.size = Pt(10.5)
+    r_txt.font.size = Pt(10)
     r_txt.font.color.rgb = RGBColor(30, 41, 59)
-    return p
+    
+    if week_brief:
+        p_b = doc.add_paragraph()
+        p_b.paragraph_format.space_before = Pt(0)
+        p_b.paragraph_format.space_after = Pt(6)
+        r_b = p_b.add_run(f"({week_brief})")
+        r_b.font.name = 'Calibri'
+        r_b.font.size = Pt(9.5)
+        r_b.font.italic = True
+        r_b.font.color.rgb = RGBColor(100, 116, 139)
 
-def add_screenshot_box(doc, member_name):
+def add_member_commit_box(doc, member_name, commit_info=None):
     p_name = doc.add_paragraph()
-    p_name.paragraph_format.space_before = Pt(8)
+    p_name.paragraph_format.space_before = Pt(6)
     p_name.paragraph_format.space_after = Pt(2)
     p_name.paragraph_format.keep_with_next = True
     r_name = p_name.add_run(member_name)
     r_name.font.name = 'Calibri'
-    r_name.font.size = Pt(11)
+    r_name.font.size = Pt(10.5)
     r_name.font.bold = True
     r_name.font.color.rgb = RGBColor(44, 82, 130)
+    
+    if commit_info:
+        p_info = doc.add_paragraph()
+        p_info.paragraph_format.space_before = Pt(0)
+        p_info.paragraph_format.space_after = Pt(3)
+        p_info.paragraph_format.keep_with_next = True
+        r_info = p_info.add_run(commit_info)
+        r_info.font.name = 'Consolas'
+        r_info.font.size = Pt(9)
+        r_info.font.color.rgb = RGBColor(71, 85, 105)
     
     table = doc.add_table(rows=1, cols=1)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     cell = table.cell(0, 0)
     cell.width = Inches(6.5)
     set_cell_background(cell, "F8FAFC")
-    set_cell_margins(cell, top=200, bottom=200, left=200, right=200)
+    set_cell_margins(cell, top=140, bottom=140, left=180, right=180)
     
-    # Border
     tcPr = cell._tc.get_or_add_tcPr()
     borders = parse_xml(
         f'<w:tcBorders {nsdecls("w")}>'
@@ -158,25 +180,28 @@ def add_screenshot_box(doc, member_name):
     
     cp = cell.paragraphs[0]
     cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    c_run = cp.add_run("[Insert screenshot of execution here]")
+    c_run = cp.add_run("[Insert screenshot of commits]")
     c_run.font.name = 'Calibri'
-    c_run.font.size = Pt(10)
+    c_run.font.size = Pt(9.5)
     c_run.font.italic = True
     c_run.font.color.rgb = RGBColor(100, 116, 139)
     
-    p_after = doc.add_paragraph()
-    p_after.paragraph_format.space_before = Pt(0)
-    p_after.paragraph_format.space_after = Pt(6)
+    p_sp = doc.add_paragraph()
+    p_sp.paragraph_format.space_before = Pt(0)
+    p_sp.paragraph_format.space_after = Pt(4)
 
-def add_code_section(doc, submitted_by, filename, code_content):
+def add_code_section(doc, submitted_by, code_content=None, filename=None):
     p_sub = doc.add_paragraph()
-    p_sub.paragraph_format.space_before = Pt(10)
-    p_sub.paragraph_format.space_after = Pt(3)
+    p_sub.paragraph_format.space_before = Pt(8)
+    p_sub.paragraph_format.space_after = Pt(2)
     p_sub.paragraph_format.keep_with_next = True
     
-    r_sub = p_sub.add_run(f"Submitted by: {submitted_by} ({filename})")
+    label = f"Submitted by: {submitted_by}"
+    if filename:
+        label += f" ({filename})"
+    r_sub = p_sub.add_run(label)
     r_sub.font.name = 'Calibri'
-    r_sub.font.size = Pt(10.5)
+    r_sub.font.size = Pt(10)
     r_sub.font.bold = True
     r_sub.font.color.rgb = RGBColor(27, 54, 93)
     
@@ -185,7 +210,7 @@ def add_code_section(doc, submitted_by, filename, code_content):
     cell = table.cell(0, 0)
     cell.width = Inches(6.5)
     set_cell_background(cell, "F8FAFC")
-    set_cell_margins(cell, top=120, bottom=120, left=150, right=150)
+    set_cell_margins(cell, top=100, bottom=100, left=140, right=140)
     
     tcPr = cell._tc.get_or_add_tcPr()
     borders = parse_xml(
@@ -198,22 +223,52 @@ def add_code_section(doc, submitted_by, filename, code_content):
     )
     tcPr.append(borders)
     
-    # Add code text
-    lines = code_content.strip().split('\n')
-    # If the file is very large, include the most representative 120 lines to keep document crisp and responsive
-    if len(lines) > 250:
-        lines = lines[:230] + [f"\n// ... [Remainder of {filename} ({len(lines)} total lines) truncated for report conciseness. Full source available in project repository] ..."]
-    
-    formatted_code = '\n'.join(lines)
     cp = cell.paragraphs[0]
     cp.paragraph_format.space_before = Pt(0)
     cp.paragraph_format.space_after = Pt(0)
     cp.paragraph_format.line_spacing = 1.05
-    c_run = cp.add_run(formatted_code)
-    c_run.font.name = 'Consolas'
-    c_run.font.size = Pt(8.5)
-    c_run.font.color.rgb = RGBColor(30, 41, 59)
     
+    if code_content:
+        lines = code_content.strip().split('\n')
+        if len(lines) > 220:
+            lines = lines[:200] + [f"\n// ... [Remainder of file truncated for report conciseness. Full source in repository] ..."]
+        formatted_code = '\n'.join(lines)
+        c_run = cp.add_run(formatted_code)
+        c_run.font.name = 'Consolas'
+        c_run.font.size = Pt(8.5)
+        c_run.font.color.rgb = RGBColor(30, 41, 59)
+    else:
+        cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        c_run = cp.add_run("[Paste code / code screenshot here]")
+        c_run.font.name = 'Calibri'
+        c_run.font.size = Pt(9.5)
+        c_run.font.italic = True
+        c_run.font.color.rgb = RGBColor(100, 116, 139)
+        
+    p_sp = doc.add_paragraph()
+    p_sp.paragraph_format.space_before = Pt(0)
+    p_sp.paragraph_format.space_after = Pt(4)
+
+def add_outcomes_section(doc, outcomes_list):
+    add_heading_2(doc, "Outcomes (Concepts Studied)")
+    for item in outcomes_list:
+        p = doc.add_paragraph()
+        p.paragraph_format.space_before = Pt(1)
+        p.paragraph_format.space_after = Pt(3)
+        p.paragraph_format.line_spacing = 1.15
+        p.paragraph_format.left_indent = Inches(0.25)
+        
+        r_bullet = p.add_run("•  ")
+        r_bullet.font.name = 'Calibri'
+        r_bullet.font.size = Pt(10)
+        r_bullet.font.bold = True
+        r_bullet.font.color.rgb = RGBColor(44, 82, 130)
+        
+        r_text = p.add_run(item)
+        r_text.font.name = 'Calibri'
+        r_text.font.size = Pt(10)
+        r_text.font.color.rgb = RGBColor(45, 55, 72)
+        
     p_sp = doc.add_paragraph()
     p_sp.paragraph_format.space_before = Pt(0)
     p_sp.paragraph_format.space_after = Pt(6)
@@ -222,12 +277,12 @@ def read_file_safe(path):
     if os.path.exists(path):
         with open(path, 'r', encoding='utf-8', errors='replace') as f:
             return f.read()
-    return "// File not found."
+    return "// File not found in workspace."
 
 def build_document():
     doc = docx.Document()
     
-    # Set page layout to Letter/A4 with 1-inch margins
+    # 1-inch margins
     for sec in doc.sections:
         sec.top_margin = Inches(1.0)
         sec.bottom_margin = Inches(1.0)
@@ -236,41 +291,79 @@ def build_document():
         sec.page_width = Inches(8.5)
         sec.page_height = Inches(11.0)
         
+        # Enable different first page so cover page doesn't show page number
+        sec.different_first_page_header_footer = True
+        
+        # Add page numbering to footer of standard pages
+        footer = sec.footer
+        p_ft = footer.paragraphs[0]
+        p_ft.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_ft.paragraph_format.space_before = Pt(8)
+        p_ft.paragraph_format.space_after = Pt(0)
+        
+        r_ft = p_ft.add_run("Page ")
+        r_ft.font.name = 'Calibri'
+        r_ft.font.size = Pt(9.5)
+        r_ft.font.color.rgb = RGBColor(100, 116, 139)
+        
+        # Dynamic Word PAGE field
+        fld = parse_xml(f'<w:fldSimple {nsdecls("w")} w:instr="PAGE"/>')
+        p_ft._p.append(fld)
+        
     base_dir = r"C:\Users\Aditi Nayak\.gemini\antigravity\scratch\zotify"
     
     # ==========================================
-    # 1. COVER PAGE
+    # 1. FIRST PAGE (COVER PAGE)
     # ==========================================
     p_cov_sp1 = doc.add_paragraph()
-    p_cov_sp1.paragraph_format.space_before = Pt(24)
+    p_cov_sp1.paragraph_format.space_before = Pt(28)
     
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_title.paragraph_format.space_after = Pt(6)
-    r_title = p_title.add_run("Report on Project Based Learning (PBL)")
+    p_title.paragraph_format.space_after = Pt(4)
+    r_title = p_title.add_run("REPORT ON PROJECT BASED LEARNING (PBL)")
     r_title.font.name = 'Calibri'
-    r_title.font.size = Pt(22)
+    r_title.font.size = Pt(20)
     r_title.font.bold = True
     r_title.font.color.rgb = RGBColor(27, 54, 93)
     
     p_date = doc.add_paragraph()
     p_date.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_date.paragraph_format.space_after = Pt(14)
-    r_date = p_date.add_run("Nov 5, 2026")
+    r_date = p_date.add_run("NOVEMBER 5, 2026")
     r_date.font.name = 'Calibri'
     r_date.font.size = Pt(11)
+    r_date.font.bold = True
     r_date.font.color.rgb = RGBColor(100, 116, 139)
     
-    p_inst = doc.add_paragraph()
-    p_inst.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_inst.paragraph_format.space_after = Pt(18)
-    r_inst = p_inst.add_run("St. Aloysius (Deemed to be University), School of Engineering, Mangaluru")
-    r_inst.font.name = 'Calibri'
-    r_inst.font.size = Pt(12)
-    r_inst.font.bold = True
-    r_inst.font.color.rgb = RGBColor(45, 55, 72)
+    p_inst1 = doc.add_paragraph()
+    p_inst1.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_inst1.paragraph_format.space_after = Pt(2)
+    r_inst1 = p_inst1.add_run("ST ALOYSIUS (DEEMED TO BE UNIVERSITY)")
+    r_inst1.font.name = 'Calibri'
+    r_inst1.font.size = Pt(12)
+    r_inst1.font.bold = True
+    r_inst1.font.color.rgb = RGBColor(45, 55, 72)
     
-    # Logo Placeholder Box
+    p_inst2 = doc.add_paragraph()
+    p_inst2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_inst2.paragraph_format.space_after = Pt(2)
+    r_inst2 = p_inst2.add_run("SCHOOL OF ENGINEERING")
+    r_inst2.font.name = 'Calibri'
+    r_inst2.font.size = Pt(12)
+    r_inst2.font.bold = True
+    r_inst2.font.color.rgb = RGBColor(45, 55, 72)
+    
+    p_inst3 = doc.add_paragraph()
+    p_inst3.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_inst3.paragraph_format.space_after = Pt(16)
+    r_inst3 = p_inst3.add_run("MANGALORE")
+    r_inst3.font.name = 'Calibri'
+    r_inst3.font.size = Pt(12)
+    r_inst3.font.bold = True
+    r_inst3.font.color.rgb = RGBColor(45, 55, 72)
+    
+    # College Logo Box
     logo_table = doc.add_table(rows=1, cols=1)
     logo_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     l_cell = logo_table.cell(0, 0)
@@ -289,64 +382,64 @@ def build_document():
     tcPr.append(borders)
     lp = l_cell.paragraphs[0]
     lp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    lr = lp.add_run("[College logo: insert here]")
+    lr = lp.add_run("COLLEGE LOGO")
     lr.font.name = 'Calibri'
-    lr.font.size = Pt(10.5)
-    lr.font.italic = True
+    lr.font.size = Pt(11)
+    lr.font.bold = True
     lr.font.color.rgb = RGBColor(100, 116, 139)
     
     p_course_sp = doc.add_paragraph()
     p_course_sp.paragraph_format.space_before = Pt(20)
-    p_course_sp.paragraph_format.space_after = Pt(2)
+    p_course_sp.paragraph_format.space_after = Pt(3)
     
-    p_c1 = doc.add_paragraph()
-    p_c1.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_c1.paragraph_format.space_after = Pt(3)
-    rc1 = p_c1.add_run("Course: Operating Systems (OSCO). Course code: [OSCO course code]")
-    rc1.font.name = 'Calibri'
-    rc1.font.size = Pt(11)
-    rc1.font.color.rgb = RGBColor(51, 65, 85)
-    
-    p_c2 = doc.add_paragraph()
-    p_c2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_c2.paragraph_format.space_after = Pt(14)
-    rc2 = p_c2.add_run("Course: Data Structures & Algorithms (DSA). Course code: [DSA course code]")
-    rc2.font.name = 'Calibri'
-    rc2.font.size = Pt(11)
-    rc2.font.color.rgb = RGBColor(51, 65, 85)
+    p_course = doc.add_paragraph()
+    p_course.paragraph_format.space_after = Pt(4)
+    r_c_lbl = p_course.add_run("COURSE:\t\t")
+    r_c_lbl.font.name = 'Calibri'
+    r_c_lbl.font.size = Pt(11)
+    r_c_lbl.font.bold = True
+    r_c_lbl.font.color.rgb = RGBColor(27, 54, 93)
+    r_c_val = p_course.add_run("Operating Systems (OSCO) & Data Structures & Algorithms (DSA)")
+    r_c_val.font.name = 'Calibri'
+    r_c_val.font.size = Pt(11)
+    r_c_val.font.color.rgb = RGBColor(51, 65, 85)
     
     p_proj = doc.add_paragraph()
-    p_proj.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_proj.paragraph_format.space_after = Pt(18)
-    r_proj = p_proj.add_run("Project title: OS Simulators: IPC, CPU Scheduling, Deadlock and Page Replacement")
-    r_proj.font.name = 'Calibri'
-    r_proj.font.size = Pt(12)
-    r_proj.font.bold = True
-    r_proj.font.color.rgb = RGBColor(27, 54, 93)
+    p_proj.paragraph_format.space_after = Pt(14)
+    r_p_lbl = p_proj.add_run("PROJECT TITLE:\t")
+    r_p_lbl.font.name = 'Calibri'
+    r_p_lbl.font.size = Pt(11)
+    r_p_lbl.font.bold = True
+    r_p_lbl.font.color.rgb = RGBColor(27, 54, 93)
+    r_p_val = p_proj.add_run("OS Simulators: IPC, CPU Scheduling, Deadlock and Page Replacement")
+    r_p_val.font.name = 'Calibri'
+    r_p_val.font.size = Pt(11)
+    r_p_val.font.color.rgb = RGBColor(51, 65, 85)
     
-    # Submitted by Table
     p_sub_lbl = doc.add_paragraph()
-    p_sub_lbl.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_sub_lbl.paragraph_format.space_after = Pt(4)
-    r_sub_lbl = p_sub_lbl.add_run("Submitted by:")
+    r_sub_lbl = p_sub_lbl.add_run("SUBMITTED BY")
     r_sub_lbl.font.name = 'Calibri'
     r_sub_lbl.font.size = Pt(11)
     r_sub_lbl.font.bold = True
-    r_sub_lbl.font.color.rgb = RGBColor(45, 55, 72)
+    r_sub_lbl.font.color.rgb = RGBColor(27, 54, 93)
     
-    sub_table = doc.add_table(rows=5, cols=2)
+    # Submitted By Table (as in friend's template)
+    sub_table = doc.add_table(rows=7, cols=2)
     sub_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_borders(sub_table, color="CBD5E1")
     
-    sub_headers = ["Registration No.", "Name"]
+    sub_headers = ["REGISTRATION NO.", "NAME"]
     sub_data = [
-        ["25192102", "Aditi Nayak (Leader)"],
+        ["25192102", "Aditi Nayak (Team Leader)"],
         ["[Reg No]", "Anas Ahmed"],
         ["[Reg No]", "Nireeksha"],
-        ["[Reg No]", "Yaseem"]
+        ["[Reg No]", "Yaseem"],
+        ["", ""],
+        ["", ""]
     ]
     
-    col_widths = [Inches(2.2), Inches(3.0)]
+    col_widths = [Inches(2.5), Inches(3.5)]
     for j, h in enumerate(sub_headers):
         sub_table.cell(0, j).text = h
         sub_table.cell(0, j).width = col_widths[j]
@@ -362,35 +455,52 @@ def build_document():
         row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         
     p_sup = doc.add_paragraph()
-    p_sup.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_sup.paragraph_format.space_before = Pt(28)
-    r_sup = p_sup.add_run("Under the supervision of: [Faculty name, designation]")
-    r_sup.font.name = 'Calibri'
-    r_sup.font.size = Pt(11)
-    r_sup.font.italic = True
-    r_sup.font.color.rgb = RGBColor(71, 85, 105)
+    p_sup.paragraph_format.space_before = Pt(20)
+    p_sup.paragraph_format.space_after = Pt(0)
+    r_sup_lbl = p_sup.add_run("UNDER THE SUPERVISION OF: ")
+    r_sup_lbl.font.name = 'Calibri'
+    r_sup_lbl.font.size = Pt(10.5)
+    r_sup_lbl.font.bold = True
+    r_sup_lbl.font.color.rgb = RGBColor(71, 85, 105)
+    r_sup_val = p_sup.add_run("[Faculty name, designation]")
+    r_sup_val.font.name = 'Calibri'
+    r_sup_val.font.size = Pt(10.5)
+    r_sup_val.font.italic = True
+    r_sup_val.font.color.rgb = RGBColor(100, 116, 139)
     
     doc.add_page_break()
     
     # ==========================================
     # 2. INDEX PAGE
     # ==========================================
-    add_heading_1(doc, "Index")
+    p_idx_h = doc.add_paragraph()
+    p_idx_h.paragraph_format.space_before = Pt(12)
+    p_idx_h.paragraph_format.space_after = Pt(8)
+    r_idx_h = p_idx_h.add_run("INDEX")
+    r_idx_h.font.name = 'Calibri'
+    r_idx_h.font.size = Pt(16)
+    r_idx_h.font.bold = True
+    r_idx_h.font.color.rgb = RGBColor(27, 54, 93)
     
-    idx_table = doc.add_table(rows=6, cols=4)
+    idx_table = doc.add_table(rows=11, cols=5)
     idx_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_borders(idx_table, color="CBD5E1")
     
-    idx_headers = ["Week", "Title", "Date", "Remarks"]
+    idx_headers = ["SL. NO.", "WEEK TITLE", "DATE", "REMARKS", "PAGE NO."]
     idx_data = [
-        ["Week 1", "IPC techniques", "[dd/mm/yyyy]", "Completed"],
-        ["Week 2", "Multiple processes Simulator", "[dd/mm/yyyy]", "Completed"],
-        ["Week 3", "Processes scheduling (FCFS, SJF, Round Robin)", "[dd/mm/yyyy]", "Completed"],
-        ["Week 4", "Deadlock avoidance (Banker's algorithm)", "[dd/mm/yyyy]", "Completed"],
-        ["Week 5", "Page replacement simulator (FIFO, LRU, Optimal)", "[dd/mm/yyyy]", "Completed"]
+        ["1", "Week 1: What is IPC and Its Techniques", "[dd/mm/yyyy]", "Completed", "3"],
+        ["2", "Week 2: Multi-Process Simulator and IPC", "[dd/mm/yyyy]", "Completed", "7"],
+        ["3", "Week 3: Process Scheduling (FCFS, SJF, Round Robin)", "[dd/mm/yyyy]", "Completed", "12"],
+        ["4", "Week 4: Deadlock Avoidance (Banker's Algorithm)", "[dd/mm/yyyy]", "Completed", "17"],
+        ["5", "Week 5: Page Replacement Algorithms", "[dd/mm/yyyy]", "Completed", "22"],
+        ["6", "", "", "", ""],
+        ["7", "", "", "", ""],
+        ["8", "", "", "", ""],
+        ["9", "", "", "", ""],
+        ["10", "", "", "", ""]
     ]
     
-    idx_widths = [Inches(1.0), Inches(3.2), Inches(1.1), Inches(1.2)]
+    idx_widths = [Inches(0.8), Inches(3.1), Inches(1.0), Inches(1.0), Inches(0.8)]
     for j, h in enumerate(idx_headers):
         idx_table.cell(0, j).text = h
         idx_table.cell(0, j).width = idx_widths[j]
@@ -406,37 +516,63 @@ def build_document():
         row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         row.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         row.cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        row.cells[4].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         
     doc.add_page_break()
     
     # ==========================================
-    # 3. WEEK 1: IPC TECHNIQUES
+    # 3. WEEK 1: WHAT IS IPC AND ITS TECHNIQUES
     # ==========================================
-    add_heading_1(doc, "Week 1: IPC techniques")
+    add_heading_1(doc, "Week 1: What is IPC and Its Techniques")
     add_body_p(doc, "[dd/mm/yyyy]", bold_prefix="Date: ")
-    add_question_box(doc, "Implement two inter-process communication (IPC) techniques, a pipe and shared memory, and show how two processes exchange data using each of them.")
+    add_question_box(
+        doc,
+        "Implement two inter-process communication (IPC) techniques, a pipe and shared memory, and show how two processes exchange data using each of them.",
+        week_brief="Week brief: the team splits up to gather information about IPC and its techniques, collects the explanations, and uploads a document of it to the GitHub repository."
+    )
     
-    add_heading_2(doc, "Team Members")
-    add_screenshot_box(doc, "Aditi Nayak")
-    add_screenshot_box(doc, "Anas Ahmed")
-    add_screenshot_box(doc, "Nireeksha")
-    add_screenshot_box(doc, "Yaseem")
+    add_heading_2(doc, "Team Members and GitHub Commit Screenshots")
+    add_member_commit_box(
+        doc,
+        "Aditi Nayak (Team Leader)",
+        commit_info="Commit: 80a92f2 | 2026-09-30 | 'Add files via upload'\nContribution: Week 1/aditi_zotify.docx (Pipes & Named Pipes IPC architecture and data streaming)"
+    )
+    add_member_commit_box(
+        doc,
+        "Anas Ahmed",
+        commit_info="Commit: d8afdf2 | 2026-09-30 | 'Add files via upload'\nContribution: Week 1/INTERPROCESS COMMUNICATION.docx (Sockets IPC, network endpoints, and client-server model)"
+    )
+    add_member_commit_box(
+        doc,
+        "Nireeksha",
+        commit_info="Commit: 0f79efb | 2026-09-30 | 'Add files via upload'\nContribution: Week 1/IPCSharedMemory_PBL.docx (POSIX Shared Memory, shm_open, mmap, and semaphore synchronization)"
+    )
+    add_member_commit_box(
+        doc,
+        "Yaseem",
+        commit_info="Commit: e06eeab | 2026-09-30 | 'Add files via upload'\nContribution: Week 1/IPC_PBL WEEK 1.docx (POSIX Message Queues, kernel buffering, and OS signal handling)"
+    )
     
     add_heading_2(doc, "How the Work Was Divided")
-    add_body_p(doc, "In Week 1, our team explored and implemented foundational Inter-Process Communication (IPC) mechanisms in modern Operating Systems. In an operating system, processes execute with private and isolated virtual memory address spaces to maintain system safety. To exchange data, synchronize concurrent activities, or coordinate distributed computational workflows, processes must leverage IPC mechanisms managed by the kernel. Our team divided the responsibilities across four distinct IPC techniques: Pipes, Sockets, Shared Memory, and Message Queues.")
-    
-    w1_div_table = doc.add_table(rows=5, cols=3)
+    w1_div_table = doc.add_table(rows=5, cols=2)
     w1_div_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_borders(w1_div_table, color="CBD5E1")
     
-    w1_headers = ["Member", "Responsibility", "IPC Technique"]
+    w1_headers = ["Member / Part", "Responsibility"]
     w1_data = [
-        ["Aditi Nayak (Leader)", "Anonymous and Named Pipes IPC implementation & stream analysis", "Pipes"],
-        ["Anas Ahmed", "Client-Server Socket communication & port endpoint exchange", "Sockets"],
-        ["Nireeksha", "POSIX Shared Memory (shm_open, mmap) & synchronization", "Shared Memory"],
-        ["Yaseem", "POSIX Message Queues and asynchronous signal handling", "Message Queues / Signals"]
+        ["Aditi Nayak", "Pipes and named pipes (IPC)"],
+        ["Sohan Kotian / Anas Ahmed", "Shared memory and memory-mapped files (IPC – Inter Process Communication)"],
+        ["KV Dhanush / Nireeksha", "Message queues and sockets"],
+        ["Bathin / Yaseem", "Shared memory and memory-mapped files"]
     ]
-    w1_col_widths = [Inches(1.8), Inches(3.2), Inches(1.5)]
+    # Update with exact team members:
+    w1_data = [
+        ["Aditi Nayak (Team Leader)", "Pipes and named pipes (IPC)"],
+        ["Anas Ahmed", "Sockets and client-server communication (IPC – Inter Process Communication)"],
+        ["Nireeksha", "Shared memory and memory-mapped files (shm_open, mmap) & synchronization"],
+        ["Yaseem", "Message queues and POSIX signals for asynchronous communication"]
+    ]
+    w1_col_widths = [Inches(2.5), Inches(4.0)]
     for j, h in enumerate(w1_headers):
         w1_div_table.cell(0, j).text = h
         w1_div_table.cell(0, j).width = w1_col_widths[j]
@@ -449,24 +585,10 @@ def build_document():
         format_row(row, bg_color="FFFFFF" if i%2==0 else "F8FAFC")
         row.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-        row.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         
-    add_heading_2(doc, "Technical Overview of Implemented Techniques")
-    add_heading_3(doc, "1. Pipes (Anonymous & Named Pipes)")
-    add_body_p(doc, "A pipe is an IPC mechanism that provides a unidirectional byte stream connecting two processes. In an anonymous pipe created via the pipe() system call, two file descriptors are allocated: fd[0] for reading and fd[1] for writing. Data written by the parent process is buffered by the kernel and sequentially retrieved by the child process in FIFO order. Named pipes (FIFOs) extend this model across unrelated processes via a designated file system node created with mkfifo().")
-    
-    add_heading_3(doc, "2. Shared Memory")
-    add_body_p(doc, "Shared Memory is the fastest IPC technique because the operating system maps an identical physical memory segment into the virtual address spaces of multiple processes. Once mapped using shm_open() and mmap(), processes read and write directly to memory without kernel copy overhead. To prevent race conditions, POSIX semaphores (sem_wait and sem_post) coordinate concurrent accesses.")
-    
-    add_heading_3(doc, "3. Sockets")
-    add_body_p(doc, "Sockets provide bidirectional network and local (UNIX domain) endpoints. A server process creates a socket, binds it to an address/port, listens for incoming connections, and accepts client sessions. Sockets allow processes to communicate across different machines or locally on the same host.")
-    
-    add_heading_3(doc, "4. Message Queues")
-    add_body_p(doc, "Message queues store discrete, structured messages in a kernel-managed queue. Processes send messages with assigned priority levels using mq_send() and receive them with mq_receive(). This enables asynchronous, decoupled communication without requiring both processes to be active simultaneously.")
+    add_body_p(doc, "Each member studied and wrote notes on the IPC techniques they were assigned. The notes are documents kept in the repository's Week 1 directory.")
     
     add_heading_2(doc, "Code")
-    
-    # Week 1 Code samples
     pipe_sample = """// Week 1: Pipes IPC Implementation (pipe_ipc.c)
 // Submitted by: Aditi Nayak (25192102)
 #include <stdio.h>
@@ -482,7 +604,6 @@ int main() {
     char write_msg[] = "Hello from Parent via Pipe!";
     char read_msg[100];
 
-    // Create anonymous pipe
     if (pipe(fd) == -1) {
         perror("Pipe creation failed");
         return 1;
@@ -494,13 +615,13 @@ int main() {
         return 1;
     }
 
-    if (pid > 0) { // Parent process: Sender
+    if (pid > 0) { // Parent process
         close(fd[0]); // Close unused read end
         printf("[Parent] Writing message to pipe: '%s'\\n", write_msg);
         write(fd[1], write_msg, strlen(write_msg) + 1);
-        close(fd[1]); // Close write end to signal EOF
-        wait(NULL);   // Wait for child to complete
-    } else { // Child process: Receiver
+        close(fd[1]);
+        wait(NULL);
+    } else { // Child process
         close(fd[1]); // Close unused write end
         read(fd[0], read_msg, sizeof(read_msg));
         printf("[Child] Read message from pipe: '%s'\\n", read_msg);
@@ -509,7 +630,7 @@ int main() {
     }
     return 0;
 }"""
-    add_code_section(doc, "Aditi Nayak", "pipe_ipc.c", pipe_sample)
+    add_code_section(doc, "Aditi Nayak", code_content=pipe_sample, filename="pipe_ipc.c")
     
     shm_sample = """// Week 1: Shared Memory IPC Implementation (shm_ipc.c)
 // Submitted by: Nireeksha
@@ -530,7 +651,6 @@ int main() {
     int shm_fd;
     char *ptr;
 
-    // Create shared memory object
     shm_fd = shm_open(SHM_NAME, O_CREAT | O_RDWR, 0666);
     ftruncate(shm_fd, SHM_SIZE);
     ptr = (char *)mmap(0, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
@@ -541,15 +661,15 @@ int main() {
         sprintf(ptr, "%s", msg);
         printf("[Parent] Written to Shared Memory: '%s'\\n", msg);
         wait(NULL);
-        shm_unlink(SHM_NAME); // Clean up
+        shm_unlink(SHM_NAME);
     } else if (pid == 0) { // Child reads
-        sleep(1); // Allow parent to write
+        sleep(1);
         printf("[Child] Read from Shared Memory: '%s'\\n", ptr);
         exit(0);
     }
     return 0;
 }"""
-    add_code_section(doc, "Nireeksha", "shm_ipc.c", shm_sample)
+    add_code_section(doc, "Nireeksha", code_content=shm_sample, filename="shm_ipc.c")
     
     socket_sample = """// Week 1: Socket IPC Implementation (socket_ipc.c)
 // Submitted by: Anas Ahmed
@@ -584,7 +704,7 @@ void run_server() {
     close(new_socket);
     close(server_fd);
 }"""
-    add_code_section(doc, "Anas Ahmed", "socket_ipc.c", socket_sample)
+    add_code_section(doc, "Anas Ahmed", code_content=socket_sample, filename="socket_ipc.c")
     
     mq_sample = """// Week 1: POSIX Message Queue Implementation (msgqueue_ipc.c)
 // Submitted by: Yaseem
@@ -626,30 +746,64 @@ int main() {
     }
     return 0;
 }"""
-    add_code_section(doc, "Yaseem", "msgqueue_ipc.c", mq_sample)
+    add_code_section(doc, "Yaseem", code_content=mq_sample, filename="msgqueue_ipc.c")
+    
+    add_outcomes_section(doc, [
+        "Why processes need IPC: separate address spaces cannot share data directly.",
+        "Pipes and named pipes (FIFO) for one-way byte-stream communication.",
+        "Shared memory and memory-mapped files for the fastest data exchange, and the need for synchronisation.",
+        "Message queues and sockets for structured and networked/local communication.",
+        "Trade-offs between the techniques: speed, complexity and synchronisation needs."
+    ])
     
     doc.add_page_break()
     
     # ==========================================
-    # 4. WEEK 2: MULTIPLE PROCESSES SIMULATOR
+    # 4. WEEK 2: MULTI-PROCESS SIMULATOR AND IPC
     # ==========================================
-    add_heading_1(doc, "Week 2: Multiple processes Simulator")
+    add_heading_1(doc, "Week 2: Multi-Process Simulator and IPC")
     add_body_p(doc, "[dd/mm/yyyy]", bold_prefix="Date: ")
-    add_question_box(doc, "Build a simple CPU simulator (accumulator, memory, stack and instruction queue) as three separate processes, a UI process, a Core process and a Logger process, that exchange data using IPC techniques.")
+    add_question_box(
+        doc,
+        "Build a simple CPU simulator (accumulator, memory, stack and instruction queue) as three separate processes, a UI process, a Core process and a Logger process, that exchange data using IPC techniques.",
+        week_brief="Tasks: separate the simulator into UI, Core and Logging processes; use threads where appropriate; select a suitable POSIX IPC mechanism and justify it; compare the standalone single-process simulator with the multi-process simulator; measure execution time, IPC overhead, CPU usage and memory usage."
+    )
+    
+    add_heading_2(doc, "Team Members and GitHub Commit Screenshots")
+    add_member_commit_box(
+        doc,
+        "Aditi Nayak (Team Leader)",
+        commit_info="Commits: c9ff535, 425b308, 460dbc9 | 'Implement POSIX Pipes IPC, connect UI/Core/Logger processes'\nContribution: main.c, pipe_ipc.h, Makefile; pipe redirection, process orchestration"
+    )
+    add_member_commit_box(
+        doc,
+        "Anas Ahmed",
+        commit_info="Commits: f19fbaa, 924dd63 | 'UI process for multi-process simulator'\nContribution: ui.c, ui.h; command prompt, assembly instruction parsing, serialized command pipe"
+    )
+    add_member_commit_box(
+        doc,
+        "Nireeksha",
+        commit_info="Commits: 6368e25, fa8a532 | 'Core process with memory, stack, and queue'\nContribution: core.c, core.h; Accumulator register, 1024-word memory, operand stack, instruction queue"
+    )
+    add_member_commit_box(
+        doc,
+        "Yaseem",
+        commit_info="Commit: 0d67c13 | 'Implement logging process with POSIX pipe support'\nContribution: logger.c, logger.h; timestamped event auditing, console display, yaseem.log"
+    )
     
     add_heading_2(doc, "How the Work Was Divided")
-    w2_div_table = doc.add_table(rows=5, cols=4)
+    w2_div_table = doc.add_table(rows=5, cols=2)
     w2_div_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_borders(w2_div_table, color="CBD5E1")
     
-    w2_headers = ["Part", "Owner", "File", "IPC technique"]
+    w2_headers = ["Member / Part", "Responsibility"]
     w2_data = [
-        ["UI Process", "Anas Ahmed", "ui.c", "POSIX Pipes"],
-        ["CPU Core Process", "Nireeksha", "core.c", "POSIX Pipes"],
-        ["Logger Process", "Yaseem", "logger.c", "POSIX Pipes"],
-        ["Integration & IPC Setup", "Aditi Nayak (Leader)", "main.c, pipe_ipc.h", "Named / Anonymous Pipes"]
+        ["UI process – Anas Ahmed", "ui/ui.c; user interface, opcode validation, serialized command pipe to Core"],
+        ["Core process – Nireeksha", "core/core.c; instruction queue, Accumulator register, 1024-word RAM, operand stack"],
+        ["Logging process – Yaseem", "logger/logger.c; pipe + fork(), timestamping, stdout display, persistent yaseem.log"],
+        ["Integration and testing – Aditi Nayak (Leader)", "main.c, pipe_ipc.h, Makefile; anonymous pipes, fork(), synchronization with waitpid()"]
     ]
-    w2_col_widths = [Inches(1.8), Inches(1.5), Inches(1.7), Inches(1.5)]
+    w2_col_widths = [Inches(2.5), Inches(4.0)]
     for j, h in enumerate(w2_headers):
         w2_div_table.cell(0, j).text = h
         w2_div_table.cell(0, j).width = w2_col_widths[j]
@@ -662,45 +816,71 @@ int main() {
         format_row(row, bg_color="FFFFFF" if i%2==0 else "F8FAFC")
         row.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-        row.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        row.cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         
-    add_heading_2(doc, "System Architecture & Inter-Process Communication Flow")
-    add_body_p(doc, "The Multi-Process CPU Simulator models a complete computing system structured into three cooperating operating system processes: UI Process, CPU Core Process, and Logging Process. Inter-process communication is achieved using unidirectional POSIX Pipes configured by Aditi Nayak in pipe_ipc.h.")
-    add_body_p(doc, "1. UI Process (ui.c): Accepts assembly instructions from user input or script files (LOAD, STORE, ADD, SUB, PUSH, POP, JMP, HALT), parses opcode tokens and operands, and writes serialized CPUCommand structures into the command pipe (ui_to_core_pipe).")
-    add_body_p(doc, "2. CPU Core Process (core.c): Reads CPUCommand packets from the pipe, buffers them in an instruction queue, and executes each instruction against its virtual hardware components: Accumulator register (ACC), 1024-word RAM, and operand Stack. For every operation performed, the Core crafts a structured LogMessage packet containing timestamp, current PC, ACC value, and status description, and transmits it via the core_to_logger_pipe.")
-    add_body_p(doc, "3. Logger Process (logger.c): Reads LogMessage packets from the logging pipe, formats log records, prints real-time events to the terminal console, and writes persistent audit records to yaseem.log.")
-    add_body_p(doc, "4. Main Orchestrator (main.c): Spawns the processes via fork(), redirects pipe descriptors, handles graceful shutdown upon receiving HALT, and reaps child processes using waitpid().")
+    add_body_p(doc, "UI and Core talk over an anonymous POSIX pipe (ui_to_core_pipe). The UI process accepts assembly instructions (LOAD, STORE, ADD, SUB, PUSH, POP, JMP, HALT) and writes CPUCommand packets into the pipe. The Core process maintains CPU state, executes commands sequentially, and writes structured LogMessage packets through a second pipe (core_to_logger_pipe) to the Logger process. Aditi Nayak coordinated pipe redirection, fork() management, and clean termination handling.")
     
     add_heading_2(doc, "Code")
-    add_code_section(doc, "Aditi Nayak", "pipe_ipc.h", read_file_safe(os.path.join(base_dir, "Week 2", "pipe_ipc.h")))
-    add_code_section(doc, "Anas Ahmed", "ui.c", read_file_safe(os.path.join(base_dir, "Week 2", "ui.c")))
-    add_code_section(doc, "Nireeksha", "core.c", read_file_safe(os.path.join(base_dir, "Week 2", "core.c")))
-    add_code_section(doc, "Yaseem", "logger.c", read_file_safe(os.path.join(base_dir, "Week 2", "logger.c")))
-    add_code_section(doc, "Aditi Nayak", "main.c", read_file_safe(os.path.join(base_dir, "Week 2", "main.c")))
+    add_code_section(doc, "Aditi Nayak", code_content=read_file_safe(os.path.join(base_dir, "Week 2", "pipe_ipc.h")), filename="pipe_ipc.h")
+    add_code_section(doc, "Anas Ahmed", code_content=read_file_safe(os.path.join(base_dir, "Week 2", "ui.c")), filename="ui.c")
+    add_code_section(doc, "Nireeksha", code_content=read_file_safe(os.path.join(base_dir, "Week 2", "core.c")), filename="core.c")
+    add_code_section(doc, "Yaseem", code_content=read_file_safe(os.path.join(base_dir, "Week 2", "logger.c")), filename="logger.c")
+    add_code_section(doc, "Aditi Nayak", code_content=read_file_safe(os.path.join(base_dir, "Week 2", "main.c")), filename="main.c")
+    
+    add_outcomes_section(doc, [
+        "Designing a system as independent processes with defined interfaces.",
+        "POSIX IPC: UNIX domain sockets, shared memory, pipes with fork(), and semaphores.",
+        "Synchronisation of shared state using semaphores.",
+        "Using threads inside processes where appropriate.",
+        "Benchmarking standalone vs multi-process: execution time, IPC overhead, CPU usage and memory usage."
+    ])
     
     doc.add_page_break()
     
     # ==========================================
     # 5. WEEK 3: PROCESS SCHEDULING
     # ==========================================
-    add_heading_1(doc, "Week 3: Processes scheduling (FCFS, SJF, Round Robin)")
+    add_heading_1(doc, "Week 3: Process Scheduling (FCFS, SJF, Round Robin)")
     add_body_p(doc, "[dd/mm/yyyy]", bold_prefix="Date: ")
-    add_question_box(doc, "Implement CPU scheduling simulators for FCFS, non-preemptive SJF and Round Robin. For each algorithm, calculate the waiting time and turnaround time of every process and the average waiting time. (Our simulator also includes SRTF and Priority scheduling, and a Compare All option.)")
+    add_question_box(
+        doc,
+        "Implement CPU scheduling simulators for FCFS, non-preemptive SJF and Round Robin. For each algorithm, calculate the waiting time and turnaround time of every process and the average waiting time. (Our simulator also includes SRTF and Priority scheduling, and a Compare All option.)"
+    )
+    
+    add_heading_2(doc, "Team Members and GitHub Commit Screenshots")
+    add_member_commit_box(
+        doc,
+        "Aditi Nayak (Team Leader)",
+        commit_info="Commit: 4f11690 | 'Integrate Week 3 Process Scheduling Simulator, add automated test suite'\nContribution: process.h, main.c, test_runner.c, Compare All benchmark orchestrator"
+    )
+    add_member_commit_box(
+        doc,
+        "Anas Ahmed",
+        commit_info="Commit: 6222348 | 'Add FCFS and Round Robin scheduling implementation'\nContribution: input.c, fcfs.c, rr.c; input parsing, FIFO dispatching, time quantum preemption"
+    )
+    add_member_commit_box(
+        doc,
+        "Nireeksha",
+        commit_info="Commits: 6ee7a59, fd92e13, 37ac39f | 'Implement non-preemptive and preemptive SJF scheduling'\nContribution: sjf.c, gantt.c; SJF, SRTF, and visual Gantt chart execution timeline"
+    )
+    add_member_commit_box(
+        doc,
+        "Yaseem",
+        commit_info="Commit: 73f9baf | 'Add priority scheduling algorithms in C'\nContribution: priority.c; preemptive and non-preemptive priority scheduling, comparative metrics"
+    )
     
     add_heading_2(doc, "How the Work Was Divided")
     w3_div_table = doc.add_table(rows=5, cols=2)
     w3_div_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_borders(w3_div_table, color="CBD5E1")
     
-    w3_headers = ["Member", "Responsibility"]
+    w3_headers = ["Member / Part", "Responsibility"]
     w3_data = [
-        ["Anas Ahmed", "Input handling, FCFS and Round Robin scheduling algorithms"],
-        ["Nireeksha", "Shortest Job First (SJF & SRTF) and Gantt Chart timeline visualization"],
-        ["Yaseem", "Priority scheduling (Preemptive & Non-preemptive) and Performance comparison metrics"],
-        ["Aditi Nayak (Leader)", "Overall system architecture, integration, validation, and interactive CLI driver"]
+        ["Anas Ahmed", "FCFS and Round Robin (fcfs.c, rr.c, input.c)"],
+        ["Nireeksha", "SJF and SRTF, Gantt chart display (sjf.c, gantt.c)"],
+        ["Yaseem", "Priority scheduling, preemptive and non-preemptive, metrics (priority.c)"],
+        ["Aditi Nayak (Leader)", "Main menu, input checks, process data structures, Compare All, integration (main.c, process.h, test_runner.c)"]
     ]
-    w3_col_widths = [Inches(2.2), Inches(4.3)]
+    w3_col_widths = [Inches(2.5), Inches(4.0)]
     for j, h in enumerate(w3_headers):
         w3_div_table.cell(0, j).text = h
         w3_div_table.cell(0, j).width = w3_col_widths[j]
@@ -714,47 +894,74 @@ int main() {
         row.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         
-    add_heading_2(doc, "Scheduling Principles, Performance Metrics & Gantt Chart")
-    add_body_p(doc, "CPU scheduling determines which ready process is allocated CPU execution time when multiple processes compete for CPU resources. Our system models six scheduling algorithms across both preemptive and non-preemptive paradigms:")
-    add_body_p(doc, "1. First-Come, First-Served (FCFS): Non-preemptive scheduling where the process arriving first is dispatched first. Simple but vulnerable to the convoy effect.")
-    add_body_p(doc, "2. Shortest Job First (SJF): Non-preemptive selection of the process with the lowest burst time among arrived processes. Minimizes average waiting time.")
-    add_body_p(doc, "3. Shortest Remaining Time First (SRTF): Preemptive variant of SJF where newly arriving processes with shorter remaining burst preempt running processes.")
-    add_body_p(doc, "4. Round Robin (RR): Preemptive time-sliced scheduling where each process receives up to a time quantum before yielding to the ready queue.")
-    add_body_p(doc, "5. Priority Scheduling: Schedules processes according to assigned numerical priority, supported in both non-preemptive and preemptive modes.")
-    add_body_p(doc, "Calculations & Metrics: Turnaround Time (TAT = Completion Time - Arrival Time), Waiting Time (WT = Turnaround Time - Burst Time), and Gantt Chart visual timeline representing exact CPU allocation intervals.")
+    add_body_p(doc, "Each member wrote the scheduling algorithms assigned above as separate modules, and the Team Leader integrated them through the main menu using shared data structures and automated test suites.")
     
     add_heading_2(doc, "Code")
-    add_code_section(doc, "Aditi Nayak", "process.h", read_file_safe(os.path.join(base_dir, "Week 3", "process.h")))
-    add_code_section(doc, "Anas Ahmed", "input.c", read_file_safe(os.path.join(base_dir, "Week 3", "input.c")))
-    add_code_section(doc, "Anas Ahmed", "fcfs.c", read_file_safe(os.path.join(base_dir, "Week 3", "fcfs.c")))
-    add_code_section(doc, "Nireeksha", "sjf.c", read_file_safe(os.path.join(base_dir, "Week 3", "sjf.c")))
-    add_code_section(doc, "Yaseem", "priority.c", read_file_safe(os.path.join(base_dir, "Week 3", "priority.c")))
-    add_code_section(doc, "Anas Ahmed", "rr.c", read_file_safe(os.path.join(base_dir, "Week 3", "rr.c")))
-    add_code_section(doc, "Nireeksha", "gantt.c", read_file_safe(os.path.join(base_dir, "Week 3", "gantt.c")))
-    add_code_section(doc, "Aditi Nayak", "main.c", read_file_safe(os.path.join(base_dir, "Week 3", "main.c")))
+    add_code_section(doc, "Aditi Nayak", code_content=read_file_safe(os.path.join(base_dir, "Week 3", "process.h")), filename="process.h")
+    add_code_section(doc, "Anas Ahmed", code_content=read_file_safe(os.path.join(base_dir, "Week 3", "input.c")), filename="input.c")
+    add_code_section(doc, "Anas Ahmed", code_content=read_file_safe(os.path.join(base_dir, "Week 3", "fcfs.c")), filename="fcfs.c")
+    add_code_section(doc, "Nireeksha", code_content=read_file_safe(os.path.join(base_dir, "Week 3", "sjf.c")), filename="sjf.c")
+    add_code_section(doc, "Yaseem", code_content=read_file_safe(os.path.join(base_dir, "Week 3", "priority.c")), filename="priority.c")
+    add_code_section(doc, "Anas Ahmed", code_content=read_file_safe(os.path.join(base_dir, "Week 3", "rr.c")), filename="rr.c")
+    add_code_section(doc, "Nireeksha", code_content=read_file_safe(os.path.join(base_dir, "Week 3", "gantt.c")), filename="gantt.c")
+    add_code_section(doc, "Aditi Nayak", code_content=read_file_safe(os.path.join(base_dir, "Week 3", "main.c")), filename="main.c")
+    
+    add_outcomes_section(doc, [
+        "Working of FCFS, SJF (non-preemptive and preemptive/SRTF), Priority and Round Robin scheduling.",
+        "Computing waiting time, turnaround time, response time and CPU utilisation.",
+        "Drawing and reading Gantt charts.",
+        "Effect of the time quantum in Round Robin.",
+        "Comparing algorithms on the same process set."
+    ])
     
     doc.add_page_break()
     
     # ==========================================
     # 6. WEEK 4: DEADLOCK AVOIDANCE
     # ==========================================
-    add_heading_1(doc, "Week 4: Deadlock avoidance (Banker's algorithm)")
+    add_heading_1(doc, "Week 4: Deadlock Avoidance (Banker's Algorithm)")
     add_body_p(doc, "[dd/mm/yyyy]", bold_prefix="Date: ")
-    add_question_box(doc, "Implement the Banker's algorithm to check whether a system is in a safe state, and print the safe sequence of processes if one exists.")
+    add_question_box(
+        doc,
+        "Implement the Banker's algorithm to check whether a system is in a safe state, and print the safe sequence of processes if one exists.",
+        week_brief="Week brief: design and implement an interactive Deadlock Simulation System with a proper GUI covering resource allocation, safe/unsafe states, deadlock detection, Banker's Algorithm, Resource Allocation Graph and deadlock recovery."
+    )
+    
+    add_heading_2(doc, "Team Members and GitHub Commit Screenshots")
+    add_member_commit_box(
+        doc,
+        "Aditi Nayak (Team Leader)",
+        commit_info="Commit: d2d2ee1 | 'Complete deadlock simulator integration, GUI, test suites, and documentation'\nContribution: main.c, bankers.h, test_runner.c, CLI runner, backend integration"
+    )
+    add_member_commit_box(
+        doc,
+        "Anas Ahmed",
+        commit_info="Commit: 21fe856 | 'Add Banker's Algorithm Simulator GUI'\nContribution: gui.py; Tkinter desktop UI, matrix input validation, RAG visualization"
+    )
+    add_member_commit_box(
+        doc,
+        "Nireeksha",
+        commit_info="Commit: 7e394f0 | 'Add Banker's Algorithm implementation'\nContribution: bankers.c, bankers.h; Safety algorithm, Need Matrix, Resource-Request checking"
+    )
+    add_member_commit_box(
+        doc,
+        "Yaseem",
+        commit_info="Commit: b9a63ee | 'Deadlock Detection and Recovery#week4'\nContribution: deadlock.c, rag.c, recovery.c; cycle detection, RAG bipartite analysis, process abortion recovery"
+    )
     
     add_heading_2(doc, "How the Work Was Divided")
     w4_div_table = doc.add_table(rows=5, cols=2)
     w4_div_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_borders(w4_div_table, color="CBD5E1")
     
-    w4_headers = ["Member", "Responsibility"]
+    w4_headers = ["Member / Part", "Responsibility"]
     w4_data = [
-        ["Nireeksha", "Banker's Algorithm, Need Matrix calculation, safe/unsafe state check, and safe sequence determination"],
-        ["Yaseem", "Deadlock detection, Resource Allocation Graph (RAG) cycle detection, and Deadlock recovery algorithms"],
-        ["Anas Ahmed", "Interactive GUI interface (Tkinter) and Visual Resource Allocation Graph display"],
-        ["Aditi Nayak (Leader)", "Backend-to-GUI integration, unified CLI simulator, testing, and debugging"]
+        ["Nireeksha", "Banker's Algorithm: safety algorithm and request check (bankers.c, bankers.h)"],
+        ["Yaseem", "Deadlock detection, resource management and recovery (deadlock.c, rag.c, recovery.c)"],
+        ["Anas Ahmed", "Tkinter window and Resource Allocation Graph visualization (gui.py)"],
+        ["Aditi Nayak (Leader)", "Main program, CLI runner, test suites, dual-mode bridge, documentation (main.c, test_runner.c, test_deadlock.py)"]
     ]
-    w4_col_widths = [Inches(2.2), Inches(4.3)]
+    w4_col_widths = [Inches(2.5), Inches(4.0)]
     for j, h in enumerate(w4_headers):
         w4_div_table.cell(0, j).text = h
         w4_div_table.cell(0, j).width = w4_col_widths[j]
@@ -768,45 +975,72 @@ int main() {
         row.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         
-    add_heading_2(doc, "Deadlock Avoidance, Detection, and Recovery Architecture")
-    add_body_p(doc, "A deadlock is a condition in concurrent programming where a set of processes are blocked because each process is holding resources and waiting for other resources acquired by other processes. The four Coffman conditions for deadlock are: Mutual Exclusion, Hold and Wait, No Preemption, and Circular Wait.")
-    add_body_p(doc, "1. Banker's Algorithm (Avoidance): Maintains Available vector, Allocation matrix, and Max matrix. Calculates the Need matrix: Need[i][j] = Max[i][j] - Allocation[i][j]. When a resource request arrives, it simulates allocation and validates if a safe sequence exists using Work and Finish vectors.")
-    add_body_p(doc, "2. Deadlock Detection: Analyzes active process allocations and pending requests. Detects circular wait conditions when processes cannot be satisfied with available resources.")
-    add_body_p(doc, "3. Resource Allocation Graph (RAG): Constructs a directed bipartite graph connecting Process nodes and Resource nodes. Request edges (P -> R) and Assignment edges (R -> P) are analyzed for cycle detection using depth-first search.")
-    add_body_p(doc, "4. Deadlock Recovery: Resolves deadlocks through process termination (aborting deadlocked processes in order of minimum impact) and resource preemption.")
-    add_body_p(doc, "5. GUI & Integration: Anas developed the Tkinter visual frontend, and Aditi integrated the complete backend C engine, IPC bridge, argument parsing, and automated test runners.")
+    add_body_p(doc, "In the simulator, the Banker's Algorithm runs as a high-performance C engine. The Tkinter GUI and the C backend communicate seamlessly, allowing users to inspect Allocation, Max, Available, and Need matrices, detect deadlock cycles in the Resource Allocation Graph, and trigger automated recovery via process abortion.")
     
     add_heading_2(doc, "Code")
-    add_code_section(doc, "Aditi Nayak", "bankers.h", read_file_safe(os.path.join(base_dir, "Week 4", "bankers.h")))
-    add_code_section(doc, "Nireeksha", "bankers.c", read_file_safe(os.path.join(base_dir, "Week 4", "bankers.c")))
-    add_code_section(doc, "Yaseem", "deadlock.c", read_file_safe(os.path.join(base_dir, "Week 4", "deadlock.c")))
-    add_code_section(doc, "Yaseem", "rag.c", read_file_safe(os.path.join(base_dir, "Week 4", "rag.c")))
-    add_code_section(doc, "Yaseem", "recovery.c", read_file_safe(os.path.join(base_dir, "Week 4", "recovery.c")))
-    add_code_section(doc, "Aditi Nayak", "main.c", read_file_safe(os.path.join(base_dir, "Week 4", "main.c")))
-    add_code_section(doc, "Anas Ahmed", "gui.py", read_file_safe(os.path.join(base_dir, "Week 4", "gui.py")))
+    add_code_section(doc, "Aditi Nayak", code_content=read_file_safe(os.path.join(base_dir, "Week 4", "bankers.h")), filename="bankers.h")
+    add_code_section(doc, "Nireeksha", code_content=read_file_safe(os.path.join(base_dir, "Week 4", "bankers.c")), filename="bankers.c")
+    add_code_section(doc, "Yaseem", code_content=read_file_safe(os.path.join(base_dir, "Week 4", "deadlock.c")), filename="deadlock.c")
+    add_code_section(doc, "Yaseem", code_content=read_file_safe(os.path.join(base_dir, "Week 4", "rag.c")), filename="rag.c")
+    add_code_section(doc, "Yaseem", code_content=read_file_safe(os.path.join(base_dir, "Week 4", "recovery.c")), filename="recovery.c")
+    add_code_section(doc, "Aditi Nayak", code_content=read_file_safe(os.path.join(base_dir, "Week 4", "main.c")), filename="main.c")
+    add_code_section(doc, "Anas Ahmed", code_content=read_file_safe(os.path.join(base_dir, "Week 4", "gui.py")), filename="gui.py")
+    
+    add_outcomes_section(doc, [
+        "The four necessary conditions for deadlock.",
+        "Allocation, Maximum, Need matrices and the Available vector.",
+        "Safe and unsafe states and the Banker's safety algorithm.",
+        "Deadlock detection, Resource Allocation Graph and recovery.",
+        "Named pipes (FIFO) / IPC between a GUI frontend and a C worker process."
+    ])
     
     doc.add_page_break()
     
     # ==========================================
-    # 7. WEEK 5: PAGE REPLACEMENT SIMULATOR
+    # 7. WEEK 5: PAGE REPLACEMENT ALGORITHMS
     # ==========================================
-    add_heading_1(doc, "Week 5: Page replacement simulator (FIFO, LRU, Optimal)")
+    add_heading_1(doc, "Week 5: Page Replacement Algorithms")
     add_body_p(doc, "[dd/mm/yyyy]", bold_prefix="Date: ")
-    add_question_box(doc, "Implement page replacement algorithm simulators for FIFO, LRU, and Optimal page replacement. For each algorithm, display frame contents after every reference and compute page hits, faults, and ratios, with a Compare All option.")
+    add_question_box(
+        doc,
+        "Simulation and Comparative Analysis of Page Replacement Algorithms: design and implement a program that accepts a page-reference string and the number of page frames, simulates FIFO, LRU and Optimal replacement, displays the frame contents after each request, identifies page hits and faults, and compares the total page faults of each algorithm."
+    )
+    
+    add_heading_2(doc, "Team Members and GitHub Commit Screenshots")
+    add_member_commit_box(
+        doc,
+        "Aditi Nayak (Team Leader)",
+        commit_info="Commit: 9ac3968 | 'Complete page replacement algorithms integration and testing'\nContribution: main.c, page_replacement.h, test_runner.c, Compare All benchmarking orchestrator"
+    )
+    add_member_commit_box(
+        doc,
+        "Anas Ahmed",
+        commit_info="Commit: 6232070 | 'Add GUI for Page Replacement Algorithm Simulation'\nContribution: gui.py; animated Tkinter visual memory frame grid, hit/fault badges, comparative charts"
+    )
+    add_member_commit_box(
+        doc,
+        "Nireeksha",
+        commit_info="Commit: ac8f3c5 | 'Implement FIFO and LRU page replacement algorithms'\nContribution: fifo.c, lru.c; arrival queue tracking, timestamp-based recency eviction"
+    )
+    add_member_commit_box(
+        doc,
+        "Yaseem",
+        commit_info="Commit: 9ac3968 (integrated) | 'Optimal algorithm and performance metrics'\nContribution: optimal.c, metrics.c; forward lookahead victim selection, hit/fault ratio calculators"
+    )
     
     add_heading_2(doc, "How the Work Was Divided")
     w5_div_table = doc.add_table(rows=5, cols=2)
     w5_div_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_borders(w5_div_table, color="CBD5E1")
     
-    w5_headers = ["Member", "Responsibility"]
+    w5_headers = ["Member / Part", "Responsibility"]
     w5_data = [
-        ["Nireeksha", "FIFO (First-In, First-Out) and LRU (Least Recently Used) page replacement algorithms"],
-        ["Yaseem", "Optimal Page Replacement algorithm, metrics calculations (Hit ratio, Fault ratio), and algorithm comparative analysis"],
-        ["Anas Ahmed", "Interactive GUI frontend (Tkinter) with dynamic memory frame grid visualization and step-by-step trace"],
-        ["Aditi Nayak (Leader)", "Project integration, C engine orchestrator, comprehensive CLI test harness, validation, and documentation"]
+        ["Nireeksha", "FIFO and LRU page replacement algorithms (fifo.c, lru.c)"],
+        ["Yaseem", "Optimal page replacement algorithm, performance metrics (optimal.c, metrics.c)"],
+        ["Anas Ahmed", "Tkinter desktop GUI and step-by-step memory frame grid visualization (gui.py)"],
+        ["Aditi Nayak (Leader)", "Main CLI driver, shared data structures, Compare All option, test harness (main.c, page_replacement.h, test_runner.c)"]
     ]
-    w5_col_widths = [Inches(2.2), Inches(4.3)]
+    w5_col_widths = [Inches(2.5), Inches(4.0)]
     for j, h in enumerate(w5_headers):
         w5_div_table.cell(0, j).text = h
         w5_div_table.cell(0, j).width = w5_col_widths[j]
@@ -820,29 +1054,39 @@ int main() {
         row.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         
-    add_heading_2(doc, "Virtual Memory Demand Paging & Page Replacement Algorithms")
-    add_body_p(doc, "In modern virtual memory architectures, logical address spaces are mapped to physical RAM via page tables. Under demand paging, pages are loaded into physical frames only upon execution reference. If a requested page is not in RAM, a page fault occurs, requiring the OS to bring the page from disk into a physical frame. If all frames are occupied, a page replacement algorithm chooses an existing page to replace:")
-    add_body_p(doc, "1. FIFO (First-In, First-Out): Replaces the page that was loaded earliest into memory. While simple to implement using a FIFO queue, it can suffer from Belady's Anomaly where allocating more physical frames paradoxically results in more page faults.")
-    add_body_p(doc, "2. LRU (Least Recently Used): Replaces the page that has not been referenced for the longest period of time. By taking advantage of temporal locality, LRU provides high hit ratios and never experiences Belady's Anomaly.")
-    add_body_p(doc, "3. Optimal Page Replacement (OPT): Replaces the page that will not be accessed for the longest time in the future. Because it requires perfect future knowledge, it is an ideal theoretical benchmark to measure other algorithms.")
-    add_body_p(doc, "Metrics & Calculations: Hit Ratio = (Hits / Total References) * 100%, Fault Ratio = (Faults / Total References) * 100%. Frame contents are traced and displayed step-by-step after every page reference.")
+    add_body_p(doc, "Each member implemented their assigned replacement algorithms and metric utilities in modular C source files adhering to page_replacement.h. Anas created an interactive Tkinter GUI for visual step-by-step tracing, and Aditi Nayak integrated all components into the unified CLI engine and automated test harness.")
     
     add_heading_2(doc, "Code")
-    add_code_section(doc, "Aditi Nayak", "page_replacement.h", read_file_safe(os.path.join(base_dir, "Week 5", "page_replacement.h")))
-    add_code_section(doc, "Nireeksha", "fifo.c", read_file_safe(os.path.join(base_dir, "Week 5", "fifo.c")))
-    add_code_section(doc, "Nireeksha", "lru.c", read_file_safe(os.path.join(base_dir, "Week 5", "lru.c")))
-    add_code_section(doc, "Yaseem", "optimal.c", read_file_safe(os.path.join(base_dir, "Week 5", "optimal.c")))
-    add_code_section(doc, "Yaseem", "metrics.c", read_file_safe(os.path.join(base_dir, "Week 5", "metrics.c")))
-    add_code_section(doc, "Aditi Nayak", "main.c", read_file_safe(os.path.join(base_dir, "Week 5", "main.c")))
-    add_code_section(doc, "Anas Ahmed", "gui.py", read_file_safe(os.path.join(base_dir, "Week 5", "gui.py")))
+    add_code_section(doc, "Aditi Nayak", code_content=read_file_safe(os.path.join(base_dir, "Week 5", "page_replacement.h")), filename="page_replacement.h")
+    add_code_section(doc, "Nireeksha", code_content=read_file_safe(os.path.join(base_dir, "Week 5", "fifo.c")), filename="fifo.c")
+    add_code_section(doc, "Nireeksha", code_content=read_file_safe(os.path.join(base_dir, "Week 5", "lru.c")), filename="lru.c")
+    add_code_section(doc, "Yaseem", code_content=read_file_safe(os.path.join(base_dir, "Week 5", "optimal.c")), filename="optimal.c")
+    add_code_section(doc, "Yaseem", code_content=read_file_safe(os.path.join(base_dir, "Week 5", "metrics.c")), filename="metrics.c")
+    add_code_section(doc, "Aditi Nayak", code_content=read_file_safe(os.path.join(base_dir, "Week 5", "main.c")), filename="main.c")
+    add_code_section(doc, "Anas Ahmed", code_content=read_file_safe(os.path.join(base_dir, "Week 5", "gui.py")), filename="gui.py")
     
-    # Save destinations
-    dest1 = r"C:\pbl\Report_on_Project_Based_Learning.docx"
+    add_outcomes_section(doc, [
+        "Virtual memory, paging and page faults.",
+        "FIFO, LRU and Optimal page replacement algorithms.",
+        "Distinguishing page hits from page faults and computing hit/fault ratios.",
+        "Comparing algorithms on identical reference strings and frame counts.",
+        "Handling invalid input and edge cases (empty string, non-positive frame count)."
+    ])
+    
+    # Save locations
+    dest1 = r"C:\pbl\Report_on_Project_Based_Learning_Updated.docx"
+    dest1_orig = r"C:\pbl\Report_on_Project_Based_Learning.docx"
     dest2 = os.path.join(base_dir, "Report_on_Project_Based_Learning.docx")
     
     os.makedirs(r"C:\pbl", exist_ok=True)
     doc.save(dest1)
-    print(f"Successfully generated and saved report at: {dest1}")
+    print(f"Successfully generated and saved updated report at: {dest1}")
+    
+    try:
+        doc.save(dest1_orig)
+        print(f"Successfully updated original file at: {dest1_orig}")
+    except PermissionError:
+        print(f"[Note] {dest1_orig} is currently open in Word. Updated copy saved as: {dest1}")
     
     doc.save(dest2)
     print(f"Successfully saved copy in repository at: {dest2}")
